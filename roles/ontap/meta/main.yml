@@ -1,0 +1,10 @@
+galaxy_info:
+  author: 
+  description: "This role can be used to deploy/provision a new NetApp...."
+  company: "NetApp"
+  license: "GPL-2.0-or-later"
+  min_ansible_version: 2.9
+  galaxy_tags: [netapp, ontap, ontapai, ai, aff, fas]
+collections:
+  - netapp.ontap
+dependencies: []
