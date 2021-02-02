@@ -1,0 +1,6 @@
+---
+collections:
+- mellanox.onyx
+- netapp.ontap
+- cisco.nxos.nxos
+- netapp.elementsw
