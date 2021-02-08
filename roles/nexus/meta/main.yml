@@ -1,8 +1,0 @@
-galaxy_info:
-  author: "NetApp Solutions Automation Team"
-  description: "This role is used to setup the Nexus switches for NetApp ....."
-  company: "NetApp"
-  license: Custom license
-  min_ansible_version: 2.9.6
-  collections:
-    - cisco.nxos.nxos

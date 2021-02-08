@@ -1,8 +1,0 @@
-galaxy_info:
-  author: "NetApp Solutions Automation Team"
-  description: "This role is used to setup the Mellanox switches for NetApp HCI that uses a 2-cable compute connectivity option"
-  company: "NetApp"
-  license: Custom license
-  min_ansible_version: 2.9.6
-  collections:
-    - mellanox.onyx
