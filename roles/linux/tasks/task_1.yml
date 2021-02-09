@@ -1,0 +1,7 @@
+---
+# Install required packages, create oracle user and groups 
+- name: Install preinstall rpm for OL 
+  yum: name='{{ preinstall_rpm }}' state=present
+  become: true
+  tags:
+    - preinstall_rpm
