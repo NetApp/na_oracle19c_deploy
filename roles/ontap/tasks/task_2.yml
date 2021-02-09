@@ -1,0 +1,33 @@
+---
+- name: Create the load-sharing mirror volumes for the Oracle root volume
+  na_ontap_volume: 
+    hostname: '{{ inventory_hostname }}' 
+    username: '{{ username }}' 
+    password: '{{ password }}' 
+    state: present 
+    vserver: '{{ svm_name }}' 
+    name: '{{ item.1.ora_mirror_volume }}'
+    aggregate_name: '{{ item.0.aggr_name }}' 
+    size: 1 
+    type: DP 
+    https: true 
+    validate_certs: false
+  with_together:
+    - '{{ data_aggregates }}'
+    - '{{ ora_mirror_volumes }}'
+
+# Missing modules for SnapMirror relationships
+- name: Create a job schedule for the snapmirror of root volume
+  na_ontap_job_schedule: 
+    hostname: '{{ inventory_hostname }}' 
+    username: '{{ username }}' 
+    password: '{{ password }}' 
+    state: present 
+    name: '{{ item.job_name }}' 
+    job_minutes: '{{ item.job_minutes }}'
+    https: true 
+    validate_certs: false
+  with_items:
+    - '{{ job_schedule }}'
+  tags:
+    - ontap_config_job_schedule
