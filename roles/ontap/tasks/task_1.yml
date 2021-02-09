@@ -1,0 +1,48 @@
+---
+- name: Generate the aggr list variable for Oracle SVM
+  set_fact:
+    aggr_list: "{{ aggr_list }} + [ '{{ item.aggr_name }}' ]"
+  with_items:
+    - '{{ data_aggregates }}'
+  tags:
+    - data_aggr_config
+
+- name: See the avaialble aggr list
+  debug: 
+    msg: '{{ aggr_list }}'
+  tags:
+    - data_aggr_config
+
+- name: Create Oracle data SVM with NFS protocols enabled
+  na_ontap_svm: 
+    hostname: '{{ inventory_hostname }}' 
+    username: '{{ username }}' 
+    password: '{{ password }}' 
+    state: present 
+    name: '{{ svm_name }}' 
+    root_volume: "{{ svm_name }}_root"
+    root_volume_aggregate: '{{ data_aggregates[0].aggr_name }}'
+    root_volume_security_style: unix 
+    allowed_protocols: '{{ allowed_protocols }}' 
+    aggr_list: '{{ aggr_list }}' 
+    https: true 
+    validate_certs: false
+  tags:
+    - ora_config_svm
+
+- name: Enable NFS protcol for Oracle SVM
+  na_ontap_nfs: 
+    hostname: '{{ inventory_hostname }}' 
+    username: '{{ username }}' 
+    password: '{{ password }}' 
+    state: present 
+    vserver: '{{ svm_name }}' 
+    vstorage_state: enabled 
+    service_state: started
+    udp: disabled 
+    https: true 
+    validate_certs: false
+  tags:
+    - enable_nfs_vstorage
+
+
