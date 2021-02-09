@@ -1,0 +1,21 @@
+---
+- name: Create folder for installation files
+  file: 
+    state: directory 
+    path: '{{ installation_folder }}' 
+    owner: '{{ oracle_user }}' 
+    group: '{{ oracle_install_group }}'
+  become: true
+  tags:
+    - create_install_dir
+
+- name: Copy and unpack installer files - 19c 
+  when: ora_version == "19c"
+  unarchive: 
+    src: "{{ installer_dir }}/{{ installer_archives[1] }}" 
+    dest: "{{ installation_folder }}/" 
+    remote_src: yes
+  become: true
+  become_user: '{{ oracle_user }}'
+  tags:
+    - unzip_install_archives

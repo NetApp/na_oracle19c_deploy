@@ -1,0 +1,7 @@
+---
+- name: Generate listener response file
+  template: src="netca.rsp.{{ ora_version }}" dest="{{ installation_folder }}/netca.rsp"
+  become: true
+  become_user: '{{ oracle_user }}'
+  tags:
+    - gen_netca_rsp
