@@ -1,0 +1,10 @@
+---
+- name: Update oratab to start oracle_sid
+  when: db_instance == "SI"
+  lineinfile: 
+    dest: /etc/oratab 
+    regexp: "^{{ oracle_sid }}:{{ oracle_home }}:Y" 
+    line: "{{ oracle_sid }}:{{ oracle_home }}:Y"
+  become: true
+  tags:
+    - set_oratab

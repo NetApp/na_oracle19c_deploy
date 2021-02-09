@@ -1,0 +1,12 @@
+---
+- name: Execute Inventory root command
+  command: "{{ inventory_location }}/orainstRoot.sh"
+  become: true
+  tags:
+    - orainstroot_sh
+
+- name: Execute DB home root command
+  command: "{{ oracle_home }}/root.sh"
+  become: true
+  tags:
+    - root_sh

@@ -1,0 +1,8 @@
+---
+- name: Generate response file for dbca for single instance Oracle setup
+  when: db_instance == "SI"
+  template: src="dbca.rsp.{{ ora_version }}" dest="{{ installation_folder }}/dbca.rsp"
+  become: true
+  become_user: '{{ oracle_user }}'
+  tags:
+    - gen_dbca_rsp_si

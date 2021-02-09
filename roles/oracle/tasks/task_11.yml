@@ -1,0 +1,8 @@
+---
+- name: Check the current time
+  shell: "date +'%m-%d-%Y %H:%M:%S'"
+  register: ansible_date_time_end
+
+- name: Ansible fact - ansible_date_time
+  debug:
+    msg: '{{ ansible_date_time_end.stdout }}'

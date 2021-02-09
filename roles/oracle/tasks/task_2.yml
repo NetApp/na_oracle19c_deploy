@@ -1,0 +1,10 @@
+---
+- name: Generate the response file for software only installation
+  template: 
+    src: "db_install.rsp.{{ ora_version }}" 
+    dest: "{{ installation_folder }}/db_install.rsp" 
+    mode: '0600'
+  become: true
+  become_user: '{{ oracle_user }}'
+  tags:
+    - gen_rsp
