@@ -1,28 +1,12 @@
 ---
-- name: Create a pam.d session file
-  file:
-    path: /etc/pam.d/common-session
-    state: touch
-    mode: 0644
-  become: true
-
-- name: Add a line to enable limits change without reboot
+- name: Increase file descriptor hard limit
   lineinfile:
-    path: /etc/pam.d/common-session
-    regexp: '^session required pam_limits.so'
-    line: "session required pam_limits.so"
+    path: /etc/security/limits.conf
+    line: "*               hard    nofile          65536"
   become: true
 
-- name: Create a pam.d session non-interactive file
-  file:
-    path: /etc/pam.d/common-session-noninteractive
-    state: touch
-    mode: 0644
-  become: true
-
-- name: Add a line to enable limits change without reboot
+- name: Increase min stack size
   lineinfile:
-    path: /etc/pam.d/common-session-noninteractive
-    regexp: '^session required pam_limits.so'
-    line: "session required pam_limits.so"
+    path: /etc/security/limits.conf
+    line: "*               soft    stack           10240"
   become: true

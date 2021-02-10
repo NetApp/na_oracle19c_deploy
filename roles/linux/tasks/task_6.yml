@@ -1,12 +1,20 @@
 ---
-- name: Increase file descriptor hard limit
-  lineinfile:
-    path: /etc/security/limits.conf
-    line: "*               hard    nofile          65536"
+- name: Update ntp servers to chronyd, default ntp servers not working
+  replace:
+    path: /etc/chrony.conf
+    regexp: '^server {{ item }}.ol.pool.ntp.org iburst'
+    replace: 'server {{ item }}.us.pool.ntp.org iburst'
+  loop:
+    - 0
+    - 1
+    - 2
+    - 3
   become: true
+  tags:
+    - update_ntp_server
 
-- name: Increase min stack size
-  lineinfile:
-    path: /etc/security/limits.conf
-    line: "*               soft    stack           10240"
+- name: Restart chronyd service
+  service:
+    name: chronyd
+    state: restarted
   become: true

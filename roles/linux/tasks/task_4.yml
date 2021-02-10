@@ -1,12 +1,29 @@
 ---
-- name: Disable SELinux
-  selinux: state=disabled
+- name: Disable transparent hugepages in current system
+  shell: |
+    echo never > /sys/kernel/mm/transparent_hugepage/enabled
+    echo never > /sys/kernel/mm/transparent_hugepage/defrag
   become: true
   tags:
-    - disable_selinux
+    - disable_thp
 
-- name: Disable firewall deamon (firewalld)
-  service: name=firewalld state=stopped enabled=no
+- name: Disable transparent hugepages at reboot
+  lineinfile:
+    path: /etc/rc.local
+    line: |
+      # Disable transparent hugepages
+      if test -f /sys/kernel/mm/transparent_hugepage/enabled; then
+         echo never > /sys/kernel/mm/transparent_hugepage/enabled
+      fi
+      if test -f /sys/kernel/mm/transparent_hugepage/defrag; then
+         echo never > /sys/kernel/mm/transparent_hugepage/defrag
+      fi
   become: true
   tags:
-    - disable_firewall
+    - disable_thp
+
+- name: Configure kernel for hugepages
+  sysctl: name=vm.nr_hugepages value='{{ hugepages_nr }}' state=present
+  become: true
+  tags:
+    - config_hugepages

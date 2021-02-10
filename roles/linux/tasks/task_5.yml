@@ -1,20 +1,12 @@
 ---
-- name: Update ntp servers to chronyd, default ntp servers not working
-  replace:
-    path: /etc/chrony.conf
-    regexp: '^server {{ item }}.ol.pool.ntp.org iburst'
-    replace: 'server {{ item }}.us.pool.ntp.org iburst'
-  loop:
-    - 0
-    - 1
-    - 2
-    - 3
+- name: Disable SELinux
+  selinux: state=disabled
   become: true
   tags:
-    - update_ntp_server
+    - disable_selinux
 
-- name: Restart chronyd service
-  service:
-    name: chronyd
-    state: restarted
+- name: Disable firewall deamon (firewalld)
+  service: name=firewalld state=stopped enabled=no
   become: true
+  tags:
+    - disable_firewall

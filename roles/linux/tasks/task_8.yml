@@ -1,0 +1,28 @@
+---
+- name: Create a pam.d session file
+  file:
+    path: /etc/pam.d/common-session
+    state: touch
+    mode: 0644
+  become: true
+
+- name: Add a line to enable limits change without reboot
+  lineinfile:
+    path: /etc/pam.d/common-session
+    regexp: '^session required pam_limits.so'
+    line: "session required pam_limits.so"
+  become: true
+
+- name: Create a pam.d session non-interactive file
+  file:
+    path: /etc/pam.d/common-session-noninteractive
+    state: touch
+    mode: 0644
+  become: true
+
+- name: Add a line to enable limits change without reboot
+  lineinfile:
+    path: /etc/pam.d/common-session-noninteractive
+    regexp: '^session required pam_limits.so'
+    line: "session required pam_limits.so"
+  become: true
