@@ -1,29 +1,32 @@
 ---
-- name: Disable transparent hugepages in current system
-  shell: |
-    echo never > /sys/kernel/mm/transparent_hugepage/enabled
-    echo never > /sys/kernel/mm/transparent_hugepage/defrag
+- name: Create Oracle base directory
+  file: 
+    state: directory 
+    path: '{{ oracle_base }}' 
+    owner: '{{ oracle_user }}' 
+    group: '{{ oracle_install_group }}'
   become: true
   tags:
-    - disable_thp
+    - oracle_base
 
-- name: Disable transparent hugepages at reboot
-  lineinfile:
-    path: /etc/rc.local
-    line: |
-      # Disable transparent hugepages
-      if test -f /sys/kernel/mm/transparent_hugepage/enabled; then
-         echo never > /sys/kernel/mm/transparent_hugepage/enabled
-      fi
-      if test -f /sys/kernel/mm/transparent_hugepage/defrag; then
-         echo never > /sys/kernel/mm/transparent_hugepage/defrag
-      fi
+- name: Create Oracle data directory
+  when: storage_type == "FS"
+  file: 
+    state: directory 
+    path: '{{ oracle_data }}' 
+    owner: '{{ oracle_user }}' 
+    group: '{{ oracle_install_group }}'
   become: true
   tags:
-    - disable_thp
+    - oracle_data
 
-- name: Configure kernel for hugepages
-  sysctl: name=vm.nr_hugepages value='{{ hugepages_nr }}' state=present
+- name: Create Oracle recovery directory
+  when: storage_type == "FS"
+  file: 
+    state: directory 
+    path: '{{ oracle_reco }}' 
+    owner: '{{ oracle_user }}' 
+    group: '{{ oracle_install_group }}'
   become: true
   tags:
-    - config_hugepages
+    - oracle_reco

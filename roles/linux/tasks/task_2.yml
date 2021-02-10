@@ -1,32 +1,7 @@
 ---
-- name: Create Oracle base directory
-  file: 
-    state: directory 
-    path: '{{ oracle_base }}' 
-    owner: '{{ oracle_user }}' 
-    group: '{{ oracle_install_group }}'
+# Install required packages, create oracle user and groups 
+- name: Install preinstall rpm for OL 
+  yum: name='{{ preinstall_rpm }}' state=present
   become: true
   tags:
-    - oracle_base
-
-- name: Create Oracle data directory
-  when: storage_type == "FS"
-  file: 
-    state: directory 
-    path: '{{ oracle_data }}' 
-    owner: '{{ oracle_user }}' 
-    group: '{{ oracle_install_group }}'
-  become: true
-  tags:
-    - oracle_data
-
-- name: Create Oracle recovery directory
-  when: storage_type == "FS"
-  file: 
-    state: directory 
-    path: '{{ oracle_reco }}' 
-    owner: '{{ oracle_user }}' 
-    group: '{{ oracle_install_group }}'
-  become: true
-  tags:
-    - oracle_reco
+    - preinstall_rpm
