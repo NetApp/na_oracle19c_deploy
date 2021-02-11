@@ -1,6 +1,7 @@
 ---
+#Create LIFs for NFS volume client access
 - block:
-    - name: Create lifs for Oracle NFS datastores client access
+    - name: Create lifs for Oracle NFS volumes client access
       na_ontap_interface:
         hostname: "{{ inventory_hostname }}"
         username: "{{ username }}"
@@ -31,7 +32,7 @@
     - name: Failure message
       debug:
         msg:
-          - "TASK [Setting MTU, speed and description for compute ports on Switch A] FAILED. Hints:"
+          - "TASK [Create lifs for Oracle NFS volumes client access] FAILED. Hints:"
           - 1. Check the failure error message
           - 2. Check vars file to ensure there is no discrepancy in the variable declaration
           - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task      
