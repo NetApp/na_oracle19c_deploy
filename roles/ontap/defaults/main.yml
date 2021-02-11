@@ -1,1 +1,24 @@
 ---
+data_aggregates:
+  - {aggr_name: aggr01_node01, diskcount: 5}
+  - {aggr_name: aggr01_node02, diskcount: 5}
+
+#List of aggregates for SVM
+aggr_list: []    
+
+svm_name: ora_svm
+
+# Root volume for infrastructure svm
+svm_root_volume: ora_svm_root
+
+# Create root mirror volumes for oracle SVM
+root_mirror_volumes:
+  - {root_mirror_volume: '{{ svm_name }}_m01'}
+  - {root_mirror_volume: '{{ svm_name }}_m02'}
+
+#Job Schedule
+job_schedule:
+  - {job_name: 15min,job_minutes: 15}
+
+#Password for vsadmin user of Oracle SVM
+vsadmin_password: NetApp!23    

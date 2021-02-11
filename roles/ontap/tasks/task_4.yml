@@ -1,29 +1,24 @@
 ---
-- name: Create ora svm nfs export policy rules
-  na_ontap_export_policy_rule:
+- name: Create lifs for Oracle NFS datastores client access
+  na_ontap_interface:
     hostname: '{{ inventory_hostname }}'
     username: '{{ username }}'
     password: '{{ password }}'
     state: present
     vserver: '{{ svm_name }}'
-    policy_name: '{{ nfs_exp_policy }}'
-    client_match: '{{ ora_client_match }}'
-    protocol: '{{ data_protocol }}'
-    ro_rule: sys
-    rw_rule: sys
-    super_user_security: sys
-    allow_suid: False
+    role: data
+    protocols: nfs
+    home_node: '{{ item.1.node_name }}'
+    home_port: "a0a-{{ storage_vlans[2].vlan_id }}"
+    address: '{{ item.0.address }}'
+    netmask: '{{ item.0.netmask }}'
+    interface_name: '{{ item.0.name }}'
+    admin_status: up
+    failover_policy: broadcast-domain-wide
+    firewall_policy: data
+    is_auto_revert: true
     https: true
     validate_certs: false
-
-- name: Add ora svm nfs export policy to the root volume
-  na_ontap_volume:
-    hostname: '{{ inventory_hostname }}'
-    username: '{{ username }}'
-    password: '{{ password }}'
-    state: present
-    name: "{{ svm_name }}_root"
-    policy: '{{ nfs_exp_policy }}'
-    vserver: '{{ svm_name }}'
-    https: true
-    validate_certs: false
+  with_together:
+    - '{{ ora_nfs_lifs }}'
+    - '{{ node_data_ports }}'

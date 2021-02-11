@@ -1,0 +1,25 @@
+---
+- name: Create LIF for Oracle SVM Management
+  na_ontap_interface:
+    hostname: '{{ inventory_hostname }}' 
+    username: '{{ username }}' 
+    password: '{{ password }}' 
+    state: present 
+    vserver: '{{ svm_name }}' 
+    role: data 
+    protocols: none 
+    home_node: '{{ node_data_ports[0].node_name }}' 
+    home_port: '{{ item.home_port }}'
+    address: '{{ item.address }}' 
+    netmask: '{{ item.netmask }}' 
+    interface_name: '{{ item.lif_name }}' 
+    admin_status: up 
+    failover_policy: broadcast-domain-wide 
+    firewall_policy: mgmt 
+    is_auto_revert: true 
+    https: true 
+    validate_certs: false
+  with_items:
+    - '{{ ora_svm_specs }}'
+  tags:
+    - cre_ora_svm_mgmt_lif
