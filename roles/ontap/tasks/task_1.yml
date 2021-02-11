@@ -1,4 +1,5 @@
 ---
+#Generate an Aggreate list to use for the SVM Creation
 - block:
     - name: Generate the aggr list variable for Oracle SVM
       set_fact:
@@ -12,7 +13,7 @@
     - name: Failure message
       debug:
         msg:
-          - "TASK [Setting MTU, speed and description for compute ports on Switch A] FAILED. Hints:"
+          - "TASK [Generate the aggr list variable for Oracle SVM] FAILED. Hints:"
           - 1. Check the failure error message
           - 2. Check vars file to ensure there is no discrepancy in the variable declaration
           - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
@@ -26,11 +27,12 @@
     - name: Failure message
       debug:
         msg:
-          - "TASK [Setting MTU, speed and description for compute ports on Switch A] FAILED. Hints:"
+          - "TASK [See the avaialble aggr list] FAILED. Hints:"
           - 1. Check the failure error message
           - 2. Check vars file to ensure there is no discrepancy in the variable declaration
           - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
 
+#Create SVM
 - block:      
     - name: Create Oracle data SVM with NFS protocols enabled
       na_ontap_svm: 
@@ -42,7 +44,6 @@
         root_volume: "{{ svm_name }}_root"
         root_volume_aggregate: "{{ data_aggregates[0].aggr_name }}"
         root_volume_security_style: unix 
-    #    allowed_protocols: "{{ allowed_protocols }}"
         aggr_list: "{{ aggr_list }}" 
         https: true 
         validate_certs: false
@@ -52,11 +53,12 @@
     - name: Failure message
       debug:
         msg:
-          - "TASK [Setting MTU, speed and description for compute ports on Switch A] FAILED. Hints:"
+          - "TASK [Create Oracle data SVM with NFS protocols enabled] FAILED. Hints:"
           - 1. Check the failure error message
           - 2. Check vars file to ensure there is no discrepancy in the variable declaration
           - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
 
+#Enable NFS Protocol for SVM
 - block:      
     - name: Enable NFS protcol for Oracle SVM
       na_ontap_nfs: 
@@ -76,7 +78,7 @@
     - name: Failure message
       debug:
         msg:
-          - "TASK [Setting MTU, speed and description for compute ports on Switch A] FAILED. Hints:"
+          - "TASK [Enable NFS protcol for Oracle SVM] FAILED. Hints:"
           - 1. Check the failure error message
           - 2. Check vars file to ensure there is no discrepancy in the variable declaration
           - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
@@ -105,7 +107,7 @@
     - name: Failure message
       debug:
         msg:
-          - "TASK [Setting MTU, speed and description for compute ports on Switch A] FAILED. Hints:"
+          - "TASK [Create the load-sharing mirror volumes for the Oracle root volume] FAILED. Hints:"
           - 1. Check the failure error message
           - 2. Check vars file to ensure there is no discrepancy in the variable declaration
           - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
@@ -130,7 +132,7 @@
     - name: Failure message
       debug:
         msg:
-          - "TASK [Setting MTU, speed and description for compute ports on Switch A] FAILED. Hints:"
+          - "TASK [Create a job schedule for the snapmirror of root volume] FAILED. Hints:"
           - 1. Check the failure error message
           - 2. Check vars file to ensure there is no discrepancy in the variable declaration
           - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
@@ -159,7 +161,7 @@
     - name: Failure message
       debug:
         msg:
-          - "TASK [Setting MTU, speed and description for compute ports on Switch A] FAILED. Hints:"
+          - "TASK [Create the SnapMirror relationships] FAILED. Hints:"
           - 1. Check the failure error message
           - 2. Check vars file to ensure there is no discrepancy in the variable declaration
           - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
@@ -184,7 +186,7 @@
     - name: Failure message
       debug:
         msg:
-          - "TASK [Setting MTU, speed and description for compute ports on Switch A] FAILED. Hints:"
+          - "TASK [Initialize the mirroring relationship] FAILED. Hints:"
           - 1. Check the failure error message
           - 2. Check vars file to ensure there is no discrepancy in the variable declaration
           - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
@@ -212,7 +214,7 @@
     - name: Failure message
       debug:
         msg:
-          - "TASK [Setting MTU, speed and description for compute ports on Switch A] FAILED. Hints:"
+          - "TASK [Set password for vsadmin user] FAILED. Hints:"
           - 1. Check the failure error message
           - 2. Check vars file to ensure there is no discrepancy in the variable declaration
           - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
@@ -239,11 +241,12 @@
     - name: Failure message
       debug:
         msg:
-          - "TASK [Setting MTU, speed and description for compute ports on Switch A] FAILED. Hints:"
+          - "TASK [Unlock vsadmin user] FAILED. Hints:"
           - 1. Check the failure error message
           - 2. Check vars file to ensure there is no discrepancy in the variable declaration
           - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
 
+#Create LIF for SVM Management            
 - block:      
     - name: Create LIF for Oracle SVM Management
       na_ontap_interface:
@@ -273,7 +276,7 @@
     - name: Failure message
       debug:
         msg:
-          - "TASK [Setting MTU, speed and description for compute ports on Switch A] FAILED. Hints:"
+          - "TASK [Create LIF for Oracle SVM Management] FAILED. Hints:"
           - 1. Check the failure error message
           - 2. Check vars file to ensure there is no discrepancy in the variable declaration
           - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task    
