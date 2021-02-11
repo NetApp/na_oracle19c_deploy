@@ -8,19 +8,21 @@
     vserver: "{{ svm_name }}"
     role: data
     protocols: nfs
-    home_node: "{{ item.1.node_name }}"
-    home_port: "a0a-{{ storage_vlans[2].vlan_id }}"
-    address: "{{ item.0.address }}"
-    netmask: "{{ item.0.netmask }}"
-    interface_name: "{{ item.0.name }}"
+    home_node: "{{ item.1.home_node }}"
+    home_port: a0a-{{item.0.vlan_id}}
+    address: "{{ item.1.address }}"
+    netmask: "{{ item.1.netmask }}"
+    interface_name: "{{ item.1.name }}"
     admin_status: up
     failover_policy: broadcast-domain-wide
     firewall_policy: data
     is_auto_revert: true
     https: true
     validate_certs: false
-  with_together:
+  with_nested:
+    - "{{ storage_vlans }}"
     - "{{ nfs_lifs }}"
-    - "{{ node_data_ports }}"
+  when:
+    - item.0.protocol == "NFS"
   tags:
-    - ontap_nfs_lif       
+    - ontap_nfs_lif
