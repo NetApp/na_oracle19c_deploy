@@ -17,6 +17,6 @@
     https: true
     validate_certs: false
   with_items:
-    - "{{ ora_datastores_nfs }}"
+    - "{{ volumes_nfs }}"
   tags:
     - ontap_flexvol_create      

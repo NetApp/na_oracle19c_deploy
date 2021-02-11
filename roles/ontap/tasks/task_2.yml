@@ -7,7 +7,7 @@
     state: present
     vserver: "{{ svm_name }}"
     policy_name: "{{ nfs_exp_policy }}"
-    client_match: "{{ ora_client_match }}"
+    client_match: "{{ client_match }}"
     protocol: "{{ data_protocol }}"
     ro_rule: sys
     rw_rule: sys
