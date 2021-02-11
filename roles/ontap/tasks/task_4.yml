@@ -20,11 +20,11 @@
         is_auto_revert: true
         https: true
         validate_certs: false
-  with_nested:
-    - "{{ storage_vlans }}"
-    - "{{ nfs_lifs }}"
-  when:
-    - item.0.protocol == "NFS"
+      with_nested:
+        - "{{ storage_vlans }}"
+        - "{{ nfs_lifs }}"
+      when:
+        - item.0.protocol == "NFS"
   tags:
     - ontap_nfs_lif
   rescue:
