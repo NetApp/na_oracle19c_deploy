@@ -1,18 +1,18 @@
 ---
 - name: Create lifs for Oracle NFS datastores client access
   na_ontap_interface:
-    hostname: '{{ inventory_hostname }}'
-    username: '{{ username }}'
-    password: '{{ password }}'
+    hostname: "{{ inventory_hostname }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
     state: present
-    vserver: '{{ svm_name }}'
+    vserver: "{{ svm_name }}"
     role: data
     protocols: nfs
-    home_node: '{{ item.1.node_name }}'
+    home_node: "{{ item.1.node_name }}"
     home_port: "a0a-{{ storage_vlans[2].vlan_id }}"
-    address: '{{ item.0.address }}'
-    netmask: '{{ item.0.netmask }}'
-    interface_name: '{{ item.0.name }}'
+    address: "{{ item.0.address }}"
+    netmask: "{{ item.0.netmask }}"
+    interface_name: "{{ item.0.name }}"
     admin_status: up
     failover_policy: broadcast-domain-wide
     firewall_policy: data
@@ -20,5 +20,7 @@
     https: true
     validate_certs: false
   with_together:
-    - '{{ ora_nfs_lifs }}'
-    - '{{ node_data_ports }}'
+    - "{{ ora_nfs_lifs }}"
+    - "{{ node_data_ports }}"
+  tags:
+    - ontap_nfs_lif       

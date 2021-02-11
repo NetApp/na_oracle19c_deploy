@@ -4,8 +4,12 @@
     - name: SVM Setup
       include_tasks: task_1.yml
       tags:
-        -
-        -
+        - ontap_config_svm
+        - ontap_ls_mirror_volumes
+        - ontap_config_job_schedule
+        - ontap_snapmirror_relationship
+        - ontap_unlock_svm_admin
+        - ontap_svm_mgmt_lif  
   rescue: 
     - name: Failure message
       debug:
@@ -15,18 +19,48 @@
           - 2. Check whether the task file exists.
           - 3. Check whether the task file name and extension is correct.
 
-#Create Lif
+#Create NFS Exports
 - block:
-    - name: SVM Setup
+    - name: NFS Exports
       include_tasks: task_2.yml
       tags:
-        -
-        -
+        - ontap_export_policy_rule
+        - ontap_export_policy_apply
   rescue:
     - name: Failure message
       debug:
         msg:
-          - "TASK [SVM Setup] FAILED. Hints:"
+          - "TASK [NFS Exports] FAILED. Hints:"
           - 1. Check the failure error message.
           - 2. Check whether the task file exists.
           - 3. Check whether the task file name and extension is correct.
+
+#Create Flexvols for Oracle Database
+- block:
+    - name: Flexvols for Oracle Database
+      include_tasks: task_3.yml
+      tags:
+        - ontap_flexvol_create
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Flexvols for Oracle Datastore] FAILED. Hints:"
+          - 1. Check the failure error message.
+          - 2. Check whether the task file exists.
+          - 3. Check whether the task file name and extension is correct.
+
+#Create lifs for Oracle NFS datastores client access
+- block:
+    - name: Lifs for Oracle NFS datastores client access
+      include_tasks: task_4.yml
+      tags:
+        - ontap_nfs_lif
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Lifs for Oracle NFS datastores client access] FAILED. Hints:"
+          - 1. Check the failure error message.
+          - 2. Check whether the task file exists.
+          - 3. Check whether the task file name and extension is correct.            

@@ -6,12 +6,12 @@
     - "{{ data_aggregates }}"
   failed_when: item.aggr_name == None or item.aggr_name == ""
   tags:
-    - data_aggr_config
+    - ontap_config_svm
 
 - name: See the avaialble aggr list
   debug: var=aggr_list 
   tags:
-    - data_aggr_config
+    - ontap_config_svm
 
 - name: Create Oracle data SVM with NFS protocols enabled
   na_ontap_svm: 
@@ -28,7 +28,7 @@
     https: true 
     validate_certs: false
   tags:
-    - ora_config_svm
+    - ontap_config_svm
 
 - name: Enable NFS protcol for Oracle SVM
   na_ontap_nfs: 
@@ -43,7 +43,7 @@
     https: true 
     validate_certs: false
   tags:
-    - enable_nfs_vstorage
+    - ontap_config_svm
 
 #Create the mirror volumes for the root volume
 - name: Create the load-sharing mirror volumes for the Oracle root volume
@@ -62,6 +62,8 @@
   with_together:
     - "{{ data_aggregates }}"
     - "{{ root_mirror_volumes }}"
+  tags:
+    - ontap_ls_mirror_volumes      
 
 #Creat Job schedule for the root volume
 - name: Create a job schedule for the snapmirror of root volume
@@ -132,7 +134,7 @@
     https: true
     validate_certs: false
   tags:
-    - ontap_unlock_svm_sdmin
+    - ontap_unlock_svm_admin
       
 #Unlock vsadmin user
 - name: Unlock vsadmin user
@@ -175,4 +177,4 @@
   with_items:
     - "{{ ora_svm_specs }}"
   tags:
-    - cre_ora_svm_mgmt_lif
+    - ontap_svm_mgmt_lif
