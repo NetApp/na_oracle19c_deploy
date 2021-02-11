@@ -1,33 +1,51 @@
 ---
-- name: Create ora svm nfs export policy rules
-  na_ontap_export_policy_rule:
-    hostname: "{{ inventory_hostname }}"
-    username: "{{ username }}"
-    password: "{{ password }}"
-    state: present
-    vserver: "{{ svm_name }}"
-    policy_name: "{{ nfs_exp_policy }}"
-    client_match: "{{ client_match }}"
-    protocol: "{{ data_protocol }}"
-    ro_rule: sys
-    rw_rule: sys
-    super_user_security: sys
-    allow_suid: False
-    https: true
-    validate_certs: false
+- block:
+    - name: Create ora svm nfs export policy rules
+      na_ontap_export_policy_rule:
+        hostname: "{{ inventory_hostname }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+        state: present
+        vserver: "{{ svm_name }}"
+        policy_name: "{{ nfs_exp_policy }}"
+        client_match: "{{ client_match }}"
+        protocol: "{{ data_protocol }}"
+        ro_rule: sys
+        rw_rule: sys
+        super_user_security: sys
+        allow_suid: False
+        https: true
+        validate_certs: false
   tags:
     - ontap_export_policy_rule
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Setting MTU, speed and description for compute ports on Switch A] FAILED. Hints:"
+          - 1. Check the failure error message
+          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
+          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
 
-- name: Add ora svm nfs export policy to the root volume
-  na_ontap_volume:
-    hostname: "{{ inventory_hostname }}"
-    username: "{{ username }}"
-    password: "{{ password }}"
-    state: present
-    name: "{{ svm_name }}_root"
-    policy: "{{ nfs_exp_policy }}"
-    vserver: "{{ svm_name }}"
-    https: true
-    validate_certs: false
+- block:
+    - name: Add ora svm nfs export policy to the root volume
+      na_ontap_volume:
+        hostname: "{{ inventory_hostname }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+        state: present
+        name: "{{ svm_name }}_root"
+        policy: "{{ nfs_exp_policy }}"
+        vserver: "{{ svm_name }}"
+        https: true
+        validate_certs: false
   tags:
-    - ontap_export_policy_apply      
+    - ontap_export_policy_apply
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Setting MTU, speed and description for compute ports on Switch A] FAILED. Hints:"
+          - 1. Check the failure error message
+          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
+          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task      

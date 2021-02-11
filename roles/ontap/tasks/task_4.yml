@@ -1,24 +1,25 @@
 ---
-- name: Create lifs for Oracle NFS datastores client access
-  na_ontap_interface:
-    hostname: "{{ inventory_hostname }}"
-    username: "{{ username }}"
-    password: "{{ password }}"
-    state: present
-    vserver: "{{ svm_name }}"
-    role: data
-    protocols: nfs
-    home_node: "{{ item.1.home_node }}"
-    home_port: a0a-{{item.0.vlan_id}}
-    address: "{{ item.1.address }}"
-    netmask: "{{ item.1.netmask }}"
-    interface_name: "{{ item.1.name }}"
-    admin_status: up
-    failover_policy: broadcast-domain-wide
-    firewall_policy: data
-    is_auto_revert: true
-    https: true
-    validate_certs: false
+- block:
+    - name: Create lifs for Oracle NFS datastores client access
+      na_ontap_interface:
+        hostname: "{{ inventory_hostname }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+        state: present
+        vserver: "{{ svm_name }}"
+        role: data
+        protocols: nfs
+        home_node: "{{ item.1.home_node }}"
+        home_port: a0a-{{item.0.vlan_id}}
+        address: "{{ item.1.address }}"
+        netmask: "{{ item.1.netmask }}"
+        interface_name: "{{ item.1.name }}"
+        admin_status: up
+        failover_policy: broadcast-domain-wide
+        firewall_policy: data
+        is_auto_revert: true
+        https: true
+        validate_certs: false
   with_nested:
     - "{{ storage_vlans }}"
     - "{{ nfs_lifs }}"
@@ -26,3 +27,11 @@
     - item.0.protocol == "NFS"
   tags:
     - ontap_nfs_lif
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Setting MTU, speed and description for compute ports on Switch A] FAILED. Hints:"
+          - 1. Check the failure error message
+          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
+          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task      
