@@ -21,4 +21,36 @@ job_schedule:
   - {job_name: 15min,job_minutes: 15}
 
 #Password for vsadmin user of Oracle SVM
-vsadmin_password: NetApp!23    
+vsadmin_password: NetApp!23
+
+# SVM Management LIF Details
+svm_specs:
+  - {home_port: e0M, address: 172.21.91.127, netmask: 255.255.255.0, lif_name: '{{ svm_name }}_mgmt'}
+
+# NFS storage parameters when sprotocol set to NFS
+volumes_nfs:
+  - {vol_name: rtpora03_u01, aggr_name: '{{ data_aggregates[0].aggr_name }}', lif: '{{ ora_nfs_lifs[0].address }}', size: 25}
+  - {vol_name: rtpora03_u02, aggr_name: '{{ data_aggregates[0].aggr_name }}', lif: '{{ ora_nfs_lifs[0].address }}', size: 100}
+  - {vol_name: rtpora03_u03, aggr_name: '{{ data_aggregates[0].aggr_name }}', lif: '{{ ora_nfs_lifs[0].address }}', size: 100}
+  - {vol_name: rtpora04_u01, aggr_name: '{{ data_aggregates[1].aggr_name }}', lif: '{{ ora_nfs_lifs[1].address }}', size: 25}
+  - {vol_name: rtpora04_u02, aggr_name: '{{ data_aggregates[1].aggr_name }}', lif: '{{ ora_nfs_lifs[1].address }}', size: 100}
+  - {vol_name: rtpora04_u03, aggr_name: '{{ data_aggregates[1].aggr_name }}', lif: '{{ ora_nfs_lifs[1].address }}', size: 100}
+  - {vol_name: rtpora05_u01, aggr_name: '{{ data_aggregates[0].aggr_name }}', lif: '{{ ora_nfs_lifs[0].address }}', size: 25}
+  - {vol_name: rtpora05_u02, aggr_name: '{{ data_aggregates[0].aggr_name }}', lif: '{{ ora_nfs_lifs[0].address }}', size: 100}
+  - {vol_name: rtpora05_u03, aggr_name: '{{ data_aggregates[0].aggr_name }}', lif: '{{ ora_nfs_lifs[0].address }}', size: 100}
+
+mount_points:
+  - /u01
+  - /u02
+  - /u03
+
+nfs_lifs:
+  - {name: ora_nfs_lif01, address: 172.21.93.227, netmask: 255.255.255.0}
+  - {name: ora_nfs_lif02, address: 172.21.93.228, netmask: 255.255.255.0}
+
+#Data Protocol to be used for export policy rules
+data_protocol: nfs
+
+nfs_exp_policy: ora_client
+
+client_match: 172.21.93.0/24

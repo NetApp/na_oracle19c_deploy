@@ -20,7 +20,7 @@
     https: true
     validate_certs: false
   with_together:
-    - "{{ ora_nfs_lifs }}"
+    - "{{ nfs_lifs }}"
     - "{{ node_data_ports }}"
   tags:
     - ontap_nfs_lif       
