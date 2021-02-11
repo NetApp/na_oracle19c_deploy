@@ -1,33 +1,29 @@
 ---
-- name: Create the load-sharing mirror volumes for the Oracle root volume
-  na_ontap_volume: 
-    hostname: '{{ inventory_hostname }}' 
-    username: '{{ username }}' 
-    password: '{{ password }}' 
-    state: present 
-    vserver: '{{ svm_name }}' 
-    name: '{{ item.1.ora_mirror_volume }}'
-    aggregate_name: '{{ item.0.aggr_name }}' 
-    size: 1 
-    type: DP 
-    https: true 
+- name: Create ora svm nfs export policy rules
+  na_ontap_export_policy_rule:
+    hostname: '{{ inventory_hostname }}'
+    username: '{{ username }}'
+    password: '{{ password }}'
+    state: present
+    vserver: '{{ svm_name }}'
+    policy_name: '{{ nfs_exp_policy }}'
+    client_match: '{{ ora_client_match }}'
+    protocol: '{{ data_protocol }}'
+    ro_rule: sys
+    rw_rule: sys
+    super_user_security: sys
+    allow_suid: False
+    https: true
     validate_certs: false
-  with_together:
-    - '{{ data_aggregates }}'
-    - '{{ ora_mirror_volumes }}'
 
-# Missing modules for SnapMirror relationships
-- name: Create a job schedule for the snapmirror of root volume
-  na_ontap_job_schedule: 
-    hostname: '{{ inventory_hostname }}' 
-    username: '{{ username }}' 
-    password: '{{ password }}' 
-    state: present 
-    name: '{{ item.job_name }}' 
-    job_minutes: '{{ item.job_minutes }}'
-    https: true 
+- name: Add ora svm nfs export policy to the root volume
+  na_ontap_volume:
+    hostname: '{{ inventory_hostname }}'
+    username: '{{ username }}'
+    password: '{{ password }}'
+    state: present
+    name: "{{ svm_name }}_root"
+    policy: '{{ nfs_exp_policy }}'
+    vserver: '{{ svm_name }}'
+    https: true
     validate_certs: false
-  with_items:
-    - '{{ job_schedule }}'
-  tags:
-    - ontap_config_job_schedule
