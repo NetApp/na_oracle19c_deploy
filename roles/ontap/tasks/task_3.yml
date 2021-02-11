@@ -17,8 +17,8 @@
         junction_path: "/{{ item.vol_name }}"
         https: true
         validate_certs: false
-  with_items:
-    - "{{ volumes_nfs }}"
+      with_items:
+        - "{{ volumes_nfs }}"
   tags:
     - ontap_flexvol_create
   rescue:

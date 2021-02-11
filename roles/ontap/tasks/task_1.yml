@@ -2,10 +2,10 @@
 - block:
     - name: Generate the aggr list variable for Oracle SVM
       set_fact:
-      aggr_list: "{{ aggr_list }} + [ '{{ item.aggr_name }}' ]"
-  with_items:
-    - "{{ data_aggregates }}"
-  failed_when: item.aggr_name == None or item.aggr_name == ""
+        aggr_list: "{{ aggr_list }} + [ '{{ item.aggr_name }}' ]"
+      with_items:
+        - "{{ data_aggregates }}"
+      failed_when: item.aggr_name == None or item.aggr_name == ""
   tags:
     - ontap_config_svm
   rescue:
@@ -96,9 +96,9 @@
         type: DP 
         https: true 
         validate_certs: false
-  with_together:
-    - "{{ data_aggregates }}"
-    - "{{ root_mirror_volumes }}"
+      with_together:
+        - "{{ data_aggregates }}"
+        - "{{ root_mirror_volumes }}"
   tags:
     - ontap_ls_mirror_volumes      
   rescue:
@@ -122,8 +122,8 @@
         job_minutes: "{{ item.job_minutes }}"
         https: true 
         validate_certs: false
-  with_items:
-    - "{{ job_schedule }}"
+      with_items:
+        - "{{ job_schedule }}"
   tags:
     - ontap_config_job_schedule
   rescue:
@@ -151,8 +151,8 @@
         schedule: "{{ job_schedule.0.job_name }}"
         https: true
         validate_certs: false
-  with_items:
-    - "{{ root_mirror_volumes }}"
+      with_items:
+        - "{{ root_mirror_volumes }}"
   tags:
     - ontap_snapmirror_relationship
   rescue:
@@ -176,8 +176,8 @@
         destination_path: "{{ svm_name }}:{{ item.root_mirror_volume }}"
         https: true
         validate_certs: false
-  with_items:
-    - "{{ root_mirror_volumes }}"
+      with_items:
+        - "{{ root_mirror_volumes }}"
   tags:
     - ontap_snapmirror_relationship
   rescue:
@@ -265,8 +265,8 @@
         is_auto_revert: true 
         https: true 
         validate_certs: false
-  with_items:
-    - "{{ ora_svm_specs }}"
+      with_items:
+        - "{{ ora_svm_specs }}"
   tags:
     - ontap_svm_mgmt_lif
   rescue:
