@@ -269,7 +269,7 @@
         https: true 
         validate_certs: false
       with_items:
-        - "{{ ora_svm_specs }}"
+        - "{{ svm_specs }}"
   tags:
     - ontap_svm_mgmt_lif
   rescue:
