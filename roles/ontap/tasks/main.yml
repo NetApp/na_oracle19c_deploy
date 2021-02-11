@@ -1,1 +1,32 @@
 ---
+#ONTAP Tasks for Oracle on NFS
+- block:
+    - name: SVM Setup
+      include_tasks: task_1.yml
+      tags:
+        -
+        -
+  rescue: 
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [SVM Setup] FAILED. Hints:"
+          - 1. Check the failure error message.
+          - 2. Check whether the task file exists.
+          - 3. Check whether the task file name and extension is correct.
+
+#Create Lif
+- block:
+    - name: SVM Setup
+      include_tasks: task_2.yml
+      tags:
+        -
+        -
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [SVM Setup] FAILED. Hints:"
+          - 1. Check the failure error message.
+          - 2. Check whether the task file exists.
+          - 3. Check whether the task file name and extension is correct.
