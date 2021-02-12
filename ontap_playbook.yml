@@ -9,6 +9,5 @@
   roles:
     - role: ontap
   tags:
-    - data_aggr_config
 
 
