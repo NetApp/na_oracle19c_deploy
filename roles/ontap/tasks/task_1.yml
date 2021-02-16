@@ -138,6 +138,37 @@
           - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
 
 # Create the SnapMirror relationship
+#- block:
+#    - name: Create the SnapMirror relationships
+#      na_ontap_snapmirror:
+#        hostname: "{{ inventory_hostname }}"
+#        username: "{{ username }}"
+#        password: "{{ password }}"
+#        state: present
+#        source_endpoint:
+#          cluster: "{{ source_cluster }}"
+#          path: "{{ svm_name }} : {{ svm_root_volume }}"
+#        destination_endpoint:
+#          cluster: "{{ destination_cluster }}"
+#          path: "{{ svm_name }} : {{item.root_mirror_volume }}"      
+#        relationship_type: load_sharing
+#        schedule: "{{ job_schedule.0.job_name }}"
+#        https: true
+#        validate_certs: false
+#      with_items:
+#        - "{{ root_mirror_volumes }}"
+#  tags:
+#    - ontap_snapmirror_relationship
+#  rescue:
+#    - name: Failure message
+#      debug:
+#        msg:
+#          - "TASK [Create the SnapMirror relationships] FAILED. Hints:"
+#          - 1. Check the failure error message
+#          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
+#          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+
+#Create the SnapMirror Relationship
 - block:
     - name: Create the SnapMirror relationships
       na_ontap_snapmirror:
@@ -174,7 +205,7 @@
         username: "{{ username }}"
         password: "{{ password }}"
         state: present
-        source_path: "{{ svm_name }}: {{ svm_root_volume }}"
+        source_path: "{{ svm_name }}:{{ svm_root_volume }}"
         destination_path: "{{ svm_name }}:{{ item.root_mirror_volume }}"
         https: true
         validate_certs: false
@@ -190,6 +221,33 @@
           - 1. Check the failure error message
           - 2. Check vars file to ensure there is no discrepancy in the variable declaration
           - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+
+# Initialize the mirroring relationship
+#- block:
+#    - name: Initialize the mirroring relationship
+#      na_ontap_snapmirror:
+#        hostname: "{{ inventory_hostname }}"
+#        username: "{{ username }}"
+#        password: "{{ password }}"
+#        state: present
+#        source_endpoint:
+#          path: "{{ svm_name }} : {{ svm_root_volume }}"
+#        destination_endpoint:
+#          path: "{{ svm_name }} : {{item.root_mirror_volume }}"
+#        https: true
+#        validate_certs: false
+#      with_items:
+#        - "{{ root_mirror_volumes }}"
+#  tags:
+#    - ontap_snapmirror_relationship
+#  rescue:
+#    - name: Failure message
+#      debug:
+#        msg:
+#          - "TASK [Initialize the mirroring relationship] FAILED. Hints:"
+#          - 1. Check the failure error message
+#          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
+#          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
 
 #Set the password for vsadmin first. Account cannot be unlocked without password
 - block:
