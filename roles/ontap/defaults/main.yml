@@ -1,4 +1,8 @@
 ---
+#Credentials
+username: "{{ ansible_user }}"
+password: "{{ ansible_password }}"
+
 #Names of the Nodes in the ONTAP Cluster
 nodes:
  - Ansible-A220-01
