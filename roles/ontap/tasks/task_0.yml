@@ -12,11 +12,11 @@
           cluster-node-info:
             node-name:
         summary: yes
-      register: ontap_info_register
+      register: ontap_info_node_register
     - name: Check validity of ONTAP cluster nodes
       set_fact: 
         ontap_nodes_validity: yes
-      when: nodes is subset(ontap_info_register.ontap_info.cluster_node_info)
+      when: nodes is subset(ontap_info_node_register.ontap_info.cluster_node_info)
   tags:
     - pre_req
     - ontap_config_svm
@@ -52,11 +52,11 @@
           aggr-attributes:
             aggregate-name:
         summary: yes
-      register: ontap_info_register
+      register: ontap_info_aggregate_register
     - name: Check validity of ONTAP cluster aggregates
       set_fact: 
         ontap_aggregates_validity: yes
-      when: (data_aggregates | map(attribute='aggr_name') | list) is subset(ontap_info_register.ontap_info.aggregate_info)
+      when: (data_aggregates | map(attribute='aggr_name') | list) is subset(ontap_info_aggregate_register.ontap_info.aggregate_info)
   tags:
     - pre_req
     - ontap_config_svm
@@ -88,13 +88,13 @@
         https: true
         validate_certs: false
         gather_subset: "net_vlan_info"
-      register: ontap_info_register
+      register: ontap_info_vlan_register
     - set_fact:
         ontap_vlan_check: "{{ ontap_vlan_check + [item] }}"
       vars:
         ontap_vlan_check: []
         query: "[].value[] | [?node=='{{ item }}'].vlanid[]"
-      when: (storage_vlans | map(attribute='vlan_id') | list) is subset(ontap_info_register.ontap_info.net_vlan_info | dict2items | json_query(query))
+      when: (storage_vlans | map(attribute='vlan_id') | list) is subset(ontap_info_vlan_register.ontap_info.net_vlan_info | dict2items | json_query(query))
       with_items: "{{ nodes }}"
     - name: Check validity of VLANs on ifgroups
       set_fact:
