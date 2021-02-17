@@ -19,6 +19,16 @@
       when: nodes is subset(ontap_info_register.ontap_info.cluster_node_info)
   tags:
     - pre_req
+    - ontap_config_svm
+    - ontap_ls_mirror_volumes
+    - ontap_config_job_schedule
+    - ontap_snapmirror_relationship
+    - ontap_unlock_svm_admin
+    - ontap_svm_mgmt_lif
+    - ontap_export_policy_rule
+    - ontap_export_policy_apply
+    - ontap_flexvol_create
+    - ontap_nfs_lif
   rescue:
     - name: Failure message
       debug:
@@ -49,6 +59,16 @@
       when: (data_aggregates | map(attribute='aggr_name') | list) is subset(ontap_info_register.ontap_info.aggregate_info)
   tags:
     - pre_req
+    - ontap_config_svm
+    - ontap_ls_mirror_volumes
+    - ontap_config_job_schedule
+    - ontap_snapmirror_relationship
+    - ontap_unlock_svm_admin
+    - ontap_svm_mgmt_lif
+    - ontap_export_policy_rule
+    - ontap_export_policy_apply
+    - ontap_flexvol_create
+    - ontap_nfs_lif
   rescue:
     - name: Failure message
       debug:
@@ -82,6 +102,16 @@
       when: (ontap_vlan_check | difference(nodes) | list)|length==0
   tags:
     - pre_req
+    - ontap_config_svm
+    - ontap_ls_mirror_volumes
+    - ontap_config_job_schedule
+    - ontap_snapmirror_relationship
+    - ontap_unlock_svm_admin
+    - ontap_svm_mgmt_lif
+    - ontap_export_policy_rule
+    - ontap_export_policy_apply
+    - ontap_flexvol_create
+    - ontap_nfs_lif
   rescue:
     - name: Failure message
       debug:
