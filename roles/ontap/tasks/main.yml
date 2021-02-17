@@ -2,7 +2,7 @@
 #Check whether the pre-requisites of ONTAP cluster are met
 - block:
     - name: Pre-req check
-      include_tasks: task_0.yml
+      include_tasks: pre_req.yml
       tags:
         - pre_req
         - ontap_config_svm
@@ -27,7 +27,7 @@
 #ONTAP Tasks for Oracle on NFS
 - block:
     - name: SVM Setup
-      include_tasks: task_1.yml
+      include_tasks: svm_create.yml
       tags:
         - ontap_config_svm
         - ontap_ls_mirror_volumes
@@ -48,7 +48,7 @@
 #Create NFS Exports
 - block:
     - name: NFS Exports
-      include_tasks: task_2.yml
+      include_tasks: nfs_export_policy.yml
       tags:
         - ontap_export_policy_rule
         - ontap_export_policy_apply
@@ -65,7 +65,7 @@
 #Create Flexvols for Oracle Database
 - block:
     - name: Flexvols for Oracle Database
-      include_tasks: task_3.yml
+      include_tasks: nfs_volume_create.yml
       tags:
         - ontap_flexvol_create
   when: ontap_nodes_validity|bool and ontap_aggregates_validity|bool and ontap_vlan_validity|bool
@@ -81,7 +81,7 @@
 #Create lifs for Oracle NFS datastores client access
 - block:
     - name: Lifs for Oracle NFS datastores client access
-      include_tasks: task_4.yml
+      include_tasks: nfs_lif_create.yml
       tags:
         - ontap_nfs_lif
   when: ontap_nodes_validity|bool and ontap_aggregates_validity|bool and ontap_vlan_validity|bool
