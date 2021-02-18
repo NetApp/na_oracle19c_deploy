@@ -44,7 +44,7 @@ job_schedule:
   - {job_name: 15min,job_minutes: 15}
 
 #Password for vsadmin user of Oracle SVM
-vsadmin_password: NetApp!23
+#vsadmin_password: NetApp!23
 
 # SVM Management LIF Details
 svm_specs:
