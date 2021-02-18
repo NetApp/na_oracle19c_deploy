@@ -11,7 +11,7 @@
       prompt: Enter vsadmin password for the SVM
       unsafe: yes
       private: yes
-  when: vsadmin_password is not defined    
+      when: vsadmin_password is not defined    
   roles:
     - role: ontap
       #  tags:
