@@ -48,7 +48,7 @@ job_schedule:
 
 # SVM Management LIF Details
 svm_specs:
-  - {home_port: e0M, address: 172.21.91.129, netmask: 255.255.255.0, lif_name: '{{ svm_name }}_mgmt'}
+  - {address: 172.21.91.129, netmask: 255.255.255.0}
 
 # NFS storage parameters when sprotocol set to NFS
 volumes_nfs:
