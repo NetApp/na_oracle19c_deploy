@@ -13,12 +13,6 @@ nodes:
 storage_vlans:
    - {vlan_id: "203", name: "infra_NFS", protocol: "NFS"}
 
-#List the names of the nodes and all their ports that will be used for data traffic
-#These this should not include cluster and UTA ports used as fc target
-node_data_ports:
-  - {node_name: '{{ nodes[0] }}', ports: ["e0c","e0d"]}
-  - {node_name: '{{ nodes[1] }}', ports: ["e0c","e0d"]}
-
 #Details of the Data Aggregates that need to be created
 #If Aggregate creation takes longer, subsequent tasks of creating volumes may fail.
 #There should be enough disks already zeroed in the cluster, otherwise aggregate create will zero the disks and will take long time    
@@ -32,12 +26,12 @@ aggr_list: []
 svm_name: ora_svm
 
 # Root volume for infrastructure svm
-svm_root_volume: "{{ svm_name }}_root"
+#svm_root_volume: "{{ svm_name }}_root"
 
 # Create root mirror volumes for oracle SVM
-root_mirror_volumes:
-  - {root_mirror_volume: '{{ svm_name }}_m01'}
-  - {root_mirror_volume: '{{ svm_name }}_m02'}
+#root_mirror_volumes:
+#  - {root_mirror_volume: '{{ svm_name }}_m01'}
+#  - {root_mirror_volume: '{{ svm_name }}_m02'}
 
 #Job Schedule
 job_schedule:
@@ -47,7 +41,7 @@ job_schedule:
 #vsadmin_password: NetApp!23
 
 # SVM Management LIF Details
-svm_specs:
+svm_mgmt_defaults:
   - {home_port: e0M, address: 172.21.91.129, netmask: 255.255.255.0, lif_name: '{{ svm_name }}_mgmt'}
 
 # NFS storage parameters when sprotocol set to NFS
@@ -67,13 +61,13 @@ mount_points:
   - /u02
   - /u03
 
-nfs_lifs:
+nfs_lifs_defaults:
   - {name: '{{ svm_name }}_nfs_lif01', address: 172.21.93.237, netmask: 255.255.255.0, home_node: '{{ nodes[0] }}'}
   - {name: '{{ svm_name }}_nfs_lif02', address: 172.21.93.238, netmask: 255.255.255.0, home_node: '{{ nodes[1] }}'}
 
 #Data Protocol to be used for export policy rules
 data_protocol: nfs
 
-nfs_exp_policy: "{{ svm_name }}_client"
+#nfs_exp_policy: "{{ svm_name }}_client"
 
 client_match: 172.21.93.0/24

@@ -96,6 +96,12 @@
         query: "[].value[] | [?node=='{{ item }}'].vlanid[]"
       when: (storage_vlans | map(attribute='vlan_id') | list) is subset(ontap_info_vlan_register.ontap_info.net_vlan_info | dict2items | json_query(query))
       with_items: "{{ nodes }}"
+    - vars:
+        ontap_vlan_ifgrp: []
+      set_fact:
+        ontap_vlan_ifgrp: "{{ ontap_vlan_ifgrp + [item.value.parent_interface] }}"
+      with_items: "{{ ontap_info_vlan_register.ontap_info.net_vlan_info | dict2items }}"
+      when: item.value.vlanid in (storage_vlans | map(attribute='vlan_id') | list) 
     - name: Check validity of VLANs on ifgroups
       set_fact:
         ontap_vlan_validity: yes
@@ -117,6 +123,96 @@
       debug:
         msg:
           - "TASK [Check validity of VLANs on ifgroups] FAILED. Hints:"
+          - 1. Check the failure error message
+          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
+          - 3. Ensure that there is no residual configuration on the controller that can cause failure of this task
+
+- block:
+    - name: ONTAP cluster aggregate names
+      netapp.ontap.na_ontap_info:
+        state: info
+        hostname: "{{ inventory_hostname }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+        https: true
+        validate_certs: false
+        gather_subset: "net_ifgrp_info"
+      register: ontap_info_ports_register
+    - set_fact:
+        ontap_ports_intr: "{{ ontap_info_ports_register.ontap_info.net_ifgrp_info | dict2items }}"
+    - vars:
+        node_data_ports: []
+      set_fact:
+        node_data_ports: "{{ node_data_ports + [ {'node_name': item.value.node, 'ports': item.value.ports.lif_bindable} ] }}"
+      with_items: "{{ ontap_ports_intr }}"
+      when: (item.value.node in ontap_vlan_check) and (item.value.ifgrp_name in ontap_vlan_ifgrp)
+  tags:
+    - pre_req
+    - ontap_config_svm
+    - ontap_ls_mirror_volumes
+    - ontap_config_job_schedule
+    - ontap_snapmirror_relationship
+    - ontap_unlock_svm_admin
+    - ontap_svm_mgmt_lif
+    - ontap_export_policy_rule
+    - ontap_export_policy_apply
+    - ontap_flexvol_create
+    - ontap_nfs_lif
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Capture ifgroups info] FAILED. Hints:"
+          - 1. Check the failure error message
+          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
+          - 3. Ensure that there is no residual configuration on the controller that can cause failure of this task
+
+- block:
+    - name: Set nfs_lifs variable
+      vars:
+        nfs_lifs: []
+      set_fact:
+        nfs_lifs: "{{ nfs_lifs + [item[0] | combine(item[1], recursive=True)] }}"
+      with_together:
+        - "{{ nfs_lifs_defaults }}"
+        - "{{ nfs_lifs_details }}"
+    - name: Set svm_specs variable
+      vars:
+        svm_specs: []
+      set_fact:
+        svm_specs: "{{ svm_specs + [item[0] | combine(item[1], recursive=True)] }}"
+      with_together:
+        - "{{ svm_mgmt_defaults }}"
+        - "{{ svm_mgmt_details }}"
+    - name: Set svm_root_volume variable
+      set_fact:
+        svm_root_volume: "{{ svm_name}}_root"
+      when: svm_root_volume is not defined
+    - name: Set root_mirror_volumes variable
+      set_fact:
+        root_mirror_volumes: "[{'root_mirror_volume': '{{ svm_name }}_m01'}, {'root_mirror_volume': '{{ svm_name }}_m02'}]"
+      when: root_mirror_volumes is not defined
+    - name: Set nfs_exp_policy variable
+      set_fact:
+        nfs_exp_policy: "{{ svm_name }}_client"
+      when: nfs_exp_policy is not defined
+  tags:
+    - pre_req
+    - ontap_config_svm
+    - ontap_ls_mirror_volumes
+    - ontap_config_job_schedule
+    - ontap_snapmirror_relationship
+    - ontap_unlock_svm_admin
+    - ontap_svm_mgmt_lif
+    - ontap_export_policy_rule
+    - ontap_export_policy_apply
+    - ontap_flexvol_create
+    - ontap_nfs_lif
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Set variables] FAILED. Hints:"
           - 1. Check the failure error message
           - 2. Check vars file to ensure there is no discrepancy in the variable declaration
           - 3. Ensure that there is no residual configuration on the controller that can cause failure of this task
