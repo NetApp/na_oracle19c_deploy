@@ -186,7 +186,7 @@
         - "{{ svm_mgmt_details }}"
     - name: Set svm_root_volume variable
       set_fact:
-        svm_root_volume: "{{ svm_name}}_root"
+        svm_root_volume: "{{ svm_name }}_root"
       when: svm_root_volume is not defined
     - name: Set root_mirror_volumes variable
       set_fact:
