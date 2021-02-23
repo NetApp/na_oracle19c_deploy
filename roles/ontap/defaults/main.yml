@@ -3,27 +3,8 @@
 username: "{{ ansible_user }}"
 password: "{{ ansible_password }}"
 
-#Names of the Nodes in the ONTAP Cluster
-nodes:
- - Ansible-A220-01
- - Ansible-A220-02
-
-#Storage VLANs
-#Add additional rows for vlans as necessary
-storage_vlans:
-   - {vlan_id: "203", name: "infra_NFS", protocol: "NFS"}
-
-#Details of the Data Aggregates that need to be created
-#If Aggregate creation takes longer, subsequent tasks of creating volumes may fail.
-#There should be enough disks already zeroed in the cluster, otherwise aggregate create will zero the disks and will take long time    
-data_aggregates:
-  - {aggr_name: aggr01_node01, diskcount: 5}
-  - {aggr_name: aggr01_node02, diskcount: 5}
-
 #List of aggregates for SVM
 aggr_list: []    
-
-svm_name: ora_svm
 
 # Root volume for infrastructure svm
 #svm_root_volume: "{{ svm_name }}_root"
@@ -33,41 +14,15 @@ svm_name: ora_svm
 #  - {root_mirror_volume: '{{ svm_name }}_m01'}
 #  - {root_mirror_volume: '{{ svm_name }}_m02'}
 
-#Job Schedule
-job_schedule:
-  - {job_name: 15min,job_minutes: 15}
-
-#Password for vsadmin user of Oracle SVM
-#vsadmin_password: NetApp!23
-
 # SVM Management LIF Details
 svm_mgmt_defaults:
-  - {home_port: e0M, address: 172.21.91.129, netmask: 255.255.255.0, lif_name: '{{ svm_name }}_mgmt'}
-
-# NFS storage parameters when sprotocol set to NFS
-volumes_nfs:
-  - {vol_name: rtpora03_u01, aggr_name: '{{ data_aggregates[0].aggr_name }}', lif: '{{ nfs_lifs[0].address }}', size: 25}
-  - {vol_name: rtpora03_u02, aggr_name: '{{ data_aggregates[0].aggr_name }}', lif: '{{ nfs_lifs[0].address }}', size: 100}
-  - {vol_name: rtpora03_u03, aggr_name: '{{ data_aggregates[0].aggr_name }}', lif: '{{ nfs_lifs[0].address }}', size: 100}
-  - {vol_name: rtpora04_u01, aggr_name: '{{ data_aggregates[1].aggr_name }}', lif: '{{ nfs_lifs[1].address }}', size: 25}
-  - {vol_name: rtpora04_u02, aggr_name: '{{ data_aggregates[1].aggr_name }}', lif: '{{ nfs_lifs[1].address }}', size: 100}
-  - {vol_name: rtpora04_u03, aggr_name: '{{ data_aggregates[1].aggr_name }}', lif: '{{ nfs_lifs[1].address }}', size: 100}
-  - {vol_name: rtpora05_u01, aggr_name: '{{ data_aggregates[0].aggr_name }}', lif: '{{ nfs_lifs[0].address }}', size: 25}
-  - {vol_name: rtpora05_u02, aggr_name: '{{ data_aggregates[0].aggr_name }}', lif: '{{ nfs_lifs[0].address }}', size: 100}
-  - {vol_name: rtpora05_u03, aggr_name: '{{ data_aggregates[0].aggr_name }}', lif: '{{ nfs_lifs[0].address }}', size: 100}
-
-mount_points:
-  - /u01
-  - /u02
-  - /u03
+  - {home_port: e0M, lif_name: '{{ svm_name }}_mgmt'}
 
 nfs_lifs_defaults:
-  - {name: '{{ svm_name }}_nfs_lif01', address: 172.21.93.237, netmask: 255.255.255.0, home_node: '{{ nodes[0] }}'}
-  - {name: '{{ svm_name }}_nfs_lif02', address: 172.21.93.238, netmask: 255.255.255.0, home_node: '{{ nodes[1] }}'}
+  - {name: '{{ svm_name }}_nfs_lif01', home_node: '{{ nodes[0] }}'}
+  - {name: '{{ svm_name }}_nfs_lif02', home_node: '{{ nodes[1] }}'}
 
 #Data Protocol to be used for export policy rules
 data_protocol: nfs
 
 #nfs_exp_policy: "{{ svm_name }}_client"
-
-client_match: 172.21.93.0/24
