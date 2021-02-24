@@ -1,5 +1,15 @@
 ---
-#Check whether the pre-requisites of ONTAP cluster are met
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Check whether the pre-requisites of ONTAP cluster are met
+# Pre-requisites:
+# Verify cluster node names match what was is in ontap_vars
+# Verify aggregate names match what is in ontap_vars
+# Verify NFS vlan has been created and matches ontap_vars
+# Verify ifgrp has been created
+# Set variable facts for the following: nfs lifs, svm specs, svm root volume, svm root mirror volumes, nfs export policy
+# _______________________________________________________________________________________________________________________
+# _______________________________________________________________________________________________________________________
 - block:
     - name: Pre-req check
       include_tasks: pre_req.yml
@@ -24,7 +34,21 @@
           - 2. Check whether the task file exists.
           - 3. Check whether the task file name and extension is correct.
 
-#ONTAP Tasks for Oracle on NFS
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# ONTAP Tasks for Creation of SVM for Oracle DB
+# Generate list of data aggregates for SVM
+# Create SVM with NFS protocol
+# Enable NFS Protocol for SVM
+# Create load-sharing mirror volume for Oracle SVM root volume
+# Create job schedule for the snapmirror of SVM root volume
+# Create snapmirror relationships between SVM root volume and load-sharing mirror volumes
+# Initialize snapmirror relationship
+# Set password for vsadmin (Account cannot be unlocked with password)
+# Unlock vsadmin user for Oracle SVM
+# Create LIF for Oracle SVM Management
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 - block:
     - name: SVM Setup
       include_tasks: svm_create.yml
@@ -45,7 +69,13 @@
           - 2. Check whether the task file exists.
           - 3. Check whether the task file name and extension is correct.
 
-#Create NFS Exports
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# ONTAP tasks for NFS export policy
+# Create SVM NFS export policy rules
+# Add NFS export policy to the root volume
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 - block:
     - name: NFS Exports
       include_tasks: nfs_export_policy.yml
@@ -62,7 +92,12 @@
           - 2. Check whether the task file exists.
           - 3. Check whether the task file name and extension is correct.
 
-#Create Flexvols for Oracle Database
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# ONTAP task for creating Flexvols for Oracle Database
+# Create Flexvols for Oracle NFS volumes
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 - block:
     - name: Flexvols for Oracle Database
       include_tasks: nfs_volume_create.yml
@@ -78,7 +113,12 @@
           - 2. Check whether the task file exists.
           - 3. Check whether the task file name and extension is correct.
 
-#Create lifs for Oracle NFS datastores client access
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# ONTAP task for creating NFS LIFs
+# Create two lifs for Oracle NFS volume client access
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 - block:
     - name: Lifs for Oracle NFS datastores client access
       include_tasks: nfs_lif_create.yml
