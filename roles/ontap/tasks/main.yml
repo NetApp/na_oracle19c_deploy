@@ -6,7 +6,7 @@
 # Verify cluster node names match what was is in ontap_vars
 # Verify aggregate names match what is in ontap_vars
 # Verify NFS vlan has been created and matches ontap_vars
-# Verify ifgrp has been created
+# Verify network ports in ifgrp match ontap_vars
 # Set variable facts for the following: nfs lifs, svm specs, svm root volume, svm root mirror volumes, nfs export policy
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------

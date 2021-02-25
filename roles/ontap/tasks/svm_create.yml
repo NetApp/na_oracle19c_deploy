@@ -1,5 +1,9 @@
 ---
-#Generate an Aggreate list to use for the SVM Creation
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Generate an Aggreate list to use for the SVM Creation
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 - block:
     - name: Generate the aggr list variable for Oracle SVM
       set_fact:
@@ -32,7 +36,11 @@
           - 2. Check vars file to ensure there is no discrepancy in the variable declaration
           - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
 
-#Create SVM
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Create SVM with NFS protocol
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 - block:      
     - name: Create Oracle data SVM with NFS protocols enabled
       na_ontap_svm: 
@@ -58,7 +66,11 @@
           - 2. Check vars file to ensure there is no discrepancy in the variable declaration
           - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
 
-#Enable NFS Protocol for SVM
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Enable NFS Protocol for SVM
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 - block:      
     - name: Enable NFS protcol for Oracle SVM
       na_ontap_nfs: 
@@ -83,7 +95,11 @@
           - 2. Check vars file to ensure there is no discrepancy in the variable declaration
           - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
 
-#Create the mirror volumes for the root volume
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Create the load-sharing mirror volumes for the root volume
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 - block:
     - name: Create the load-sharing mirror volumes for the Oracle root volume
       na_ontap_volume: 
@@ -112,7 +128,11 @@
           - 2. Check vars file to ensure there is no discrepancy in the variable declaration
           - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
 
-#Creat Job schedule for the root volume
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Create Job schedule for the root volume snapmirror
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 - block:
     - name: Create a job schedule for the snapmirror of root volume
       na_ontap_job_schedule: 
@@ -137,7 +157,11 @@
           - 2. Check vars file to ensure there is no discrepancy in the variable declaration
           - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
 
-# Create the SnapMirror relationship
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Create the SnapMirror relationship between root volume and mirror volumes (new format)
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 #- block:
 #    - name: Create the SnapMirror relationships
 #      na_ontap_snapmirror:
@@ -168,7 +192,11 @@
 #          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
 #          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
 
-#Create the SnapMirror Relationship
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Create the SnapMirror relationship between root volume and mirror volumes
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 - block:
     - name: Create the SnapMirror relationships
       na_ontap_snapmirror:
@@ -197,7 +225,11 @@
           - 2. Check vars file to ensure there is no discrepancy in the variable declaration
           - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
 
-# Initialize the mirroring relationship
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Initialize the snapmirror relationship
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 - block:
     - name: Initialize the mirroring relationship
       na_ontap_snapmirror:
@@ -222,6 +254,8 @@
           - 2. Check vars file to ensure there is no discrepancy in the variable declaration
           - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
 
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 # Initialize the mirroring relationship
 #- block:
 #    - name: Initialize the mirroring relationship
@@ -249,7 +283,11 @@
 #          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
 #          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
 
-#Set the password for vsadmin first. Account cannot be unlocked without password
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Set the password for vsadmin first. Account cannot be unlocked without password
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 - block:
     - name: Set password for vsadmin user
       na_ontap_user:
@@ -277,7 +315,11 @@
           - 2. Check vars file to ensure there is no discrepancy in the variable declaration
           - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
 
-#Unlock vsadmin user
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Unlock vsadmin user (This is the SVM admin account)
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 - block:
     - name: Unlock vsadmin user
       na_ontap_user:
@@ -304,7 +346,11 @@
           - 2. Check vars file to ensure there is no discrepancy in the variable declaration
           - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
 
-#Create LIF for SVM Management            
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Create LIF for SVM Management            
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 - block:      
     - name: Create LIF for Oracle SVM Management
       na_ontap_interface:
@@ -337,4 +383,7 @@
           - "TASK [Create LIF for Oracle SVM Management] FAILED. Hints:"
           - 1. Check the failure error message
           - 2. Check vars file to ensure there is no discrepancy in the variable declaration
-          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task    
+          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------	  
