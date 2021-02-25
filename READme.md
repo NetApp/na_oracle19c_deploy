@@ -1,7 +1,7 @@
 na_oracle19c_deploy
 =========
 
-This is an archive of Ansible tasks used to configure a new ONTAP SVM along with provisioning the storage, and configuration for Oracle Linux 8.2 for an NFS Oracle19c database deploymen.
+This is an archive of Ansible tasks used to configure a new ONTAP SVM along with provisioning the storage, and configuration for Oracle Linux 8.2 for an NFS Oracle19c database deployment.
 
     Automated solutions built over these tasks are available in the na_oracle19c_deploy playbook.
     Refer to individual solutions READme.md file for instructions for use of respective solutions.
