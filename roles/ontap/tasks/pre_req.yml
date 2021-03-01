@@ -1,12 +1,48 @@
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
+# ONTAP CA-signing-certs
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+- block:
+    - name: Login when ca signed certificates are used
+      na_ontap_info:
+        hostname: "{{ inventory_hostname }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+        https: true
+        validate_certs: true
+        gather_subset: "cluster_identity_info"
+        summary: yes
+      when: ca_signed_certs|bool
+  tags:
+    - pre_req
+    - ontap_config_svm
+    - ontap_ls_mirror_volumes
+    - ontap_config_job_schedule
+    - ontap_snapmirror_relationship
+    - ontap_unlock_svm_admin
+    - ontap_svm_mgmt_lif
+    - ontap_export_policy_rule
+    - ontap_export_policy_apply
+    - ontap_flexvol_create
+    - ontap_nfs_lif
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Check validity of ONTAP cluster nodes] FAILED. Hints:"
+          - 1. Check the failure error message
+          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
+          - 3. Ensure that there is no residual configuration on the controller that can cause failure of this task
+
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 # Verify Cluster Node names
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 - block:
     - name: ONTAP cluster node names
       na_ontap_info:
-        state: info
         hostname: "{{ inventory_hostname }}"
         username: "{{ username }}"
         password: "{{ password }}"
@@ -51,7 +87,6 @@
 - block:
     - name: ONTAP data aggregate names
       na_ontap_info:
-        state: info
         hostname: "{{ inventory_hostname }}"
         username: "{{ username }}"
         password: "{{ password }}"
@@ -96,7 +131,6 @@
 - block:
     - name: ONTAP cluster VLAN check
       na_ontap_info:
-        state: info
         hostname: "{{ inventory_hostname }}"
         username: "{{ username }}"
         password: "{{ password }}"
@@ -150,7 +184,6 @@
 - block:
     - name: ONTAP ifgrp ports check
       netapp.ontap.na_ontap_info:
-        state: info
         hostname: "{{ inventory_hostname }}"
         username: "{{ username }}"
         password: "{{ password }}"

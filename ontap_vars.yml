@@ -1,4 +1,7 @@
 ---
+#CA_signed_certificates (ONLY CHANGE to 'true' IF YOU ARE USING CA SIGNED CERTIFICATES
+ca_signed_certs: false
+
 #Names of the Nodes in the ONTAP Cluster
 nodes:
  - Ansible-A220-01
