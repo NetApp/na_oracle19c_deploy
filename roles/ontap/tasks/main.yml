@@ -3,6 +3,7 @@
 # ----------------------------------------------------------------------------------------------------------------------
 # Check whether the pre-requisites of ONTAP cluster are met
 # Pre-requisites:
+# Establish if CA signed certificates are specified in ontap_vars
 # Verify cluster node names match what was is in ontap_vars
 # Verify aggregate names match what is in ontap_vars
 # Verify NFS vlan has been created and matches ontap_vars
@@ -132,4 +133,7 @@
           - "TASK [Lifs for Oracle NFS datastores client access] FAILED. Hints:"
           - 1. Check the failure error message.
           - 2. Check whether the task file exists.
-          - 3. Check whether the task file name and extension is correct.            
+          - 3. Check whether the task file name and extension is correct.
+
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------

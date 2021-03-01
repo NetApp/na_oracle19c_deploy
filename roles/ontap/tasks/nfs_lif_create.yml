@@ -1,5 +1,9 @@
 ---
-#Create LIFs for NFS volume client access
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Create LIFs for NFS volume client access
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 - block:
     - name: Create lifs for Oracle NFS volumes client access
       na_ontap_interface:
@@ -35,4 +39,7 @@
           - "TASK [Create lifs for Oracle NFS volumes client access] FAILED. Hints:"
           - 1. Check the failure error message
           - 2. Check vars file to ensure there is no discrepancy in the variable declaration
-          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task      
+          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
