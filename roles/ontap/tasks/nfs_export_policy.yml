@@ -1,5 +1,9 @@
 ---
-#Create SVM NFS Export Policy Rules
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Create SVM NFS Export Policy Rules
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 - block:
     - name: Create ora svm nfs export policy rules
       na_ontap_export_policy_rule:
@@ -27,8 +31,11 @@
           - 1. Check the failure error message
           - 2. Check vars file to ensure there is no discrepancy in the variable declaration
           - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
-
-#Add NFS Export Policy to the root volume 
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Add NFS Export Policy to the root volume 
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 - block:
     - name: Add ora svm nfs export policy to the root volume
       na_ontap_volume:
@@ -50,4 +57,7 @@
           - "TASK [Add ora svm nfs export policy to the root volume] FAILED. Hints:"
           - 1. Check the failure error message
           - 2. Check vars file to ensure there is no discrepancy in the variable declaration
-          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task      
+          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------

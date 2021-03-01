@@ -1,5 +1,9 @@
 ---
-#Create Flexvols for NFS
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Create Flexvols for NFS
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 - block:
     - name: Create FlexVols for nfs Oracle database
       na_ontap_volume:
@@ -29,4 +33,8 @@
           - "TASK [Create FlexVols for nfs Oracle database] FAILED. Hints:"
           - 1. Check the failure error message
           - 2. Check vars file to ensure there is no discrepancy in the variable declaration
-          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task      
+          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+	 
