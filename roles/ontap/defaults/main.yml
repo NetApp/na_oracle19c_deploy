@@ -16,7 +16,7 @@ aggr_list: []
 
 # SVM Management LIF Details
 svm_mgmt_defaults:
-  - {home_port: e0M, lif_name: '{{ svm_name }}_mgmt'}
+  - {lif_name: '{{ svm_name }}_mgmt'}
 
 nfs_lifs_defaults:
   - {name: '{{ svm_name }}_nfs_lif01', home_node: '{{ nodes[0] }}'}
