@@ -2,6 +2,9 @@
 #CA_signed_certificates (ONLY CHANGE to 'true' IF YOU ARE USING CA SIGNED CERTIFICATES
 ca_signed_certs: false
 
+#AWX/Tower Inventory Group name
+hosts: ontap
+
 #Names of the Nodes in the ONTAP Cluster
 nodes:
  - Ansible-A220-01
@@ -16,8 +19,8 @@ storage_vlans:
 #If Aggregate creation takes longer, subsequent tasks of creating volumes may fail.
 #There should be enough disks already zeroed in the cluster, otherwise aggregate create will zero the disks and will take long time
 data_aggregates:
-  - {aggr_name: aggr01_node01, diskcount: 5}
-  - {aggr_name: aggr01_node02, diskcount: 5}
+  - {aggr_name: aggr01_node01}
+  - {aggr_name: aggr01_node02}
 
 #List of aggregates for SVM
 aggr_list: []
@@ -38,7 +41,7 @@ job_schedule:
 
 # SVM Management LIF Details
 svm_mgmt_details:
-  - {address: 172.21.91.100, netmask: 255.255.255.0}
+  - {address: 172.21.91.100, netmask: 255.255.255.0, home_port: "e0M"}
 
 # NFS storage parameters when sprotocol set to NFS
 volumes_nfs:
