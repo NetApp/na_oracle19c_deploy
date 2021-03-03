@@ -22,9 +22,7 @@ data_aggregates:
   - {aggr_name: aggr01_node01}
   - {aggr_name: aggr01_node02}
 
-#List of aggregates for SVM
-aggr_list: []
-
+#SVM Name
 svm_name: ora_svm
 
 # Root volume for infrastructure svm
@@ -62,8 +60,6 @@ nfs_lifs_details:
   - address: 172.21.94.201 #for node-2
     netmask: 255.255.255.0
 
-#Data Protocol to be used for export policy rules
-data_protocol: nfs
 
 #nfs_exp_policy: "svm_client"
 
