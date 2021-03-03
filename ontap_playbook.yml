@@ -6,6 +6,7 @@
   gather_facts: False
   vars_files:
     - roles/ontap/defaults/main.yml    
+    - ontap_vars.yml
   vars_prompt:
     - name: vsadmin_password
       prompt: Enter vsadmin password for the SVM
