@@ -3,7 +3,7 @@
     - netapp.ontap
   hosts: "{{ hosts | default ('ontap') }}"
   connection: local
-  gather_facts: False
+  gather_facts: false
   vars_files:
     - roles/ontap/defaults/main.yml    
     - ontap_vars.yml
