@@ -3,9 +3,6 @@
 username: "{{ ansible_user }}"
 password: "{{ ansible_password }}"
 
-#List of aggregates for SVM
-aggr_list: []    
-
 # Root volume for infrastructure svm
 #svm_root_volume: "{{ svm_name }}_root"
 
