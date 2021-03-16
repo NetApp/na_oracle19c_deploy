@@ -1,1 +1,14 @@
----
+#############################################
+### Linux default configuration variables ###
+#############################################
+
+# Set DB version specific OL rpm: [ oracle-database-server-12cR2-preinstall | oracle-database-preinstall-19c ]
+preinstall_rpm: oracle-database-preinstall-19c
+
+# Oracle storage based on storage type: FS [ oracle_base: /u01/app/oracle, oracle_data:/u02/oradata, oracle_reco:/u03/orareco ]; 
+oracle_base: /u01/app/oracle
+oracle_data: /u02/oradata
+oracle_reco: /u03/orareco
+
+oracle_user: oracle
+oracle_install_group: oinstall

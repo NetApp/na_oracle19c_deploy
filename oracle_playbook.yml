@@ -1,0 +1,11 @@
+- name: Oracle installation and configuration
+  hosts: oracle
+  gather_facts: False
+  vars_files:
+    - roles/oracle/defaults/main.yml    
+    - roles/linux/defaults/main.yml    
+    - vars/vars.yml
+  roles:
+    - role: oracle 
+  tags:
+    - oracle_config

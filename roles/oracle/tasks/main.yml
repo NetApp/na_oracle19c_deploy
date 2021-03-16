@@ -1,1 +1,331 @@
 ---
+- name: Create folder for Oracle installation files
+  file:
+    state: directory
+    path: '{{ installation_folder }}'
+    owner: '{{ oracle_user }}'
+    group: '{{ oracle_install_group }}'
+  become: true
+  tags:
+    - create_installation_dir
+
+- name: Create folder for installer files
+  file:
+    state: directory
+    path: '{{ installer_dir }}'
+    owner: '{{ oracle_user }}'
+    group: '{{ oracle_install_group }}'
+  become: true
+  tags:
+    - create_installer_dir
+
+#- name: Copy Oracle 19c install file to installer directory
+#  ansible.builtin.copy:
+#    src: "/home/admin/Downloads/{{ installer_archives[0] }}"
+#    dest: '{{ installer_dir }}'
+#  become: true
+#  become_user: '{{ oracle_user }}'
+#  tags:
+#    - copy_19c_installer_file
+
+#- name: Copy DB RU 19.8 file to installer directory
+#  ansible.builtin.copy:
+#    src: "/home/admin/Downloads/{{ installer_archives[1] }}"
+#    dest: '{{ installer_dir }}'
+#  become: true
+#  become_user: '{{ oracle_user }}'
+#  tags:
+#    - copy_db_ru_file
+
+#- name: Copy latest OPatch file to installer directory
+#  ansible.builtin.copy:
+#    src: "/home/admin/Downloads/{{ installer_archives[2] }}"
+#    dest: '{{ installer_dir }}'
+#  become: true
+#  become_user: '{{ oracle_user }}'
+#  tags:
+#    - copy_opatch_file
+
+- name: Unpack Oracle 19c installer files
+  ansible.builtin.unarchive:
+    src: "{{ installer_dir }}/{{ installer_archives[0] }}"
+    dest: "{{ installation_folder }}/"
+    remote_src: yes
+  become: true
+  become_user: '{{ oracle_user }}'
+  tags:
+    - unzip_install_archives
+
+- name: Delete existing OPatch directory in oracle home
+  ansible.builtin.file:
+    path: "{{ oracle_home }}/OPatch"
+    state: absent
+  become: true
+  become_user: '{{ oracle_user }}'
+  tags:
+    - del_exist_opatch_ohome
+
+- name: Extract current version of OPatch files - p6880880
+  ansible.builtin.unarchive:
+    src: "{{ installer_dir }}/{{ installer_archives[2] }}"
+    dest: "{{ oracle_home }}/"
+    remote_src: yes
+  become: true
+  become_user: '{{ oracle_user }}'
+  tags:
+    - unzip_opatch_file_oracle
+
+- name: Unpack DB 19.8 RU patch files
+  ansible.builtin.unarchive:
+    src: "{{ installer_dir }}/{{ installer_archives[1] }}"
+    dest: "{{ installer_dir }}/"
+    remote_src: yes
+  become: true
+  become_user: '{{ oracle_user }}'
+  tags:
+    - unzip_oracle_ru_file
+
+- name: Generate a target file at template dest to work around 'invalid selinux context' issue
+  file:
+    path: "{{ installation_folder }}/db_install.rsp"
+    state: touch
+  become: true
+  become_user: '{{ oracle_user }}'
+  tags:
+    - gen_db_install_rsp
+
+- name: Generate the response file for software only installation
+  ansible.builtin.template:
+    src: "db_install.rsp.{{ ora_version }}"
+    dest: "{{ installation_folder }}/db_install.rsp"
+  become: true
+  become_user: '{{ oracle_user }}'
+  tags:
+    - gen_db_install_rsp
+
+- name: Set ASSUME_DISTID to OL7
+  ansible.builtin.replace:
+    path: "{{ oracle_home }}/cv/admin/cvu_config"
+    regexp: '#CV_ASSUME_DISTID=OEL5'
+    replace: 'CV_ASSUME_DISTID=OL7'
+  become: true
+  become_user: '{{ oracle_user }}'
+  tags:
+    - set_assume_distid_oracle
+
+- name: Install oracle software 19c
+  when: ora_version == "19c"
+  command: "{{ installation_folder}}/runInstaller -applyRU {{db_patch}} -silent -ignorePrereqFailure -responseFile {{ installation_folder }}/db_install.rsp"
+  become: true
+  become_user: '{{ oracle_user }}'
+  ignore_errors: yes
+  tags:
+    - runinstaller
+
+- name: Execute Inventory root command
+  command: "{{ inventory_location }}/orainstRoot.sh"
+  become: true
+  tags:
+    - orainstroot_sh
+
+- name: Execute DB home root command
+  command: "{{ oracle_home }}/root.sh"
+  become: true
+  tags:
+    - root_sh
+
+- name: Generate a target netca.rsp file at template dest to work around 'invalid selinux context' issue
+  file:
+    path: "{{ installation_folder }}/netca.rsp"
+    state: touch
+  become: true
+  become_user: '{{ oracle_user }}'
+  tags:
+    - gen_netca_rsp
+
+- name: Generate listener response file
+  template:
+    src: "netca.rsp.{{ ora_version }}"
+    dest: "{{ installation_folder }}/netca.rsp"
+  become: true
+  become_user: '{{ oracle_user }}'
+  tags:
+    - gen_netca_rsp
+
+- name: Create listener using netca
+  command: "{{ oracle_home }}/bin/netca -silent -responseFile {{ installation_folder }}/netca.rsp"
+  become: true
+  become_user: '{{ oracle_user }}'
+  tags:
+    - create_listener
+
+- name: Generate a target dbca.rsp file at template dest to work around 'invalid selinux context' issue
+  file:
+    path: "{{ installation_folder }}/dbca.rsp"
+    state: touch
+  become: true
+  become_user: '{{ oracle_user }}'
+  tags:
+    - gen_dbca_rsp_si
+
+- name: Generate response file for dbca for single instance Oracle setup
+  template: 
+    src: "dbca.rsp.{{ ora_version }}" 
+    dest: "{{ installation_folder }}/dbca.rsp"
+  become: true
+  become_user: '{{ oracle_user }}'
+  tags:
+    - gen_dbca_rsp_si
+
+- name: Create database for single Oracle instance
+  command: "{{ oracle_home }}/bin/dbca -silent -createDatabase -responseFile {{ installation_folder }}/dbca.rsp"
+  become: true
+  become_user: '{{ oracle_user }}'
+  tags:
+    - exec_dbca_si
+
+- name: Configure oracle user env - add oracle_home variable
+  lineinfile: 
+    dest: "/home/{{ oracle_user }}/.bashrc" 
+    line: "export ORACLE_HOME={{ oracle_home }}"
+  become: true
+  become_user: '{{ oracle_user }}'
+  tags:
+    - set_oracle_home
+
+- name: Configure oracle user env - add oracle_sid variable 
+  when: db_instance == "SI"
+  lineinfile: 
+    dest: "/home/{{ oracle_user }}/.bashrc" 
+    line: "export ORACLE_SID={{ oracle_sid }}"
+  become: true
+  become_user: '{{ oracle_user }}'
+  tags:
+    - set_oracle_sid
+
+- name: Configure oracle user env - add oracle exe to PATH
+  lineinfile: 
+    dest: "/home/{{ oracle_user }}/.bashrc" 
+    line: "export PATH=$PATH:$ORACLE_HOME/bin"
+  become: true
+  become_user: '{{ oracle_user }}'
+  tags:
+    - set_oracle_path
+
+- name: Generate a target oranfstab file at template dest to work around 'invalid selinux context' issue
+  file:
+    path: "{{ oracle_home }}/dbs/oranfstab"
+    state: touch
+  become: true
+  become_user: '{{ oracle_user }}'
+  tags:
+    - gen_oranfstab
+
+- name: Generate oranfstab file to setup dnfs volume access
+  template:
+    src: "dnfs.{{ ora_version }}"
+    dest: "{{ oracle_home }}/dbs/oranfstab"
+  become: true
+  become_user: '{{ oracle_user }}'
+  tags:
+    - gen_oranfstab
+
+#- name: Enable oracle dNFS client
+#  command: "chdir={{ oracle_home }}/rdbms/lib make -f ins_rdbms.mk dnfs_on I{{ oracle_home }}/rdbms/lib"
+#  command: "chdir={{ oracle_home }}/rdbms/lib ls"
+#  become: true
+#  become_user: '{{ oracle_user }}'
+#  tags:
+#    - dnfs_on
+
+- name: Copy pdb save state script to oracle host
+  template:
+    src: "save_state.{{ ora_version }}"
+    dest: "{{ installer_dir }}/save_state.sql"
+  become: true
+  become_user: '{{ oracle_user }}'
+  tags:
+    - save_pdb_state
+
+- name: Maintain pdbs open state after a instance restart
+  shell: "source /home/{{ oracle_user }}/.bash_profile && sqlplus -s / as sysdba @{{ installer_dir }}/save_state.sql"
+  become: true
+  become_user: '{{ oracle_user }}'
+  tags:
+    - save_pdb_state
+
+- name: Copy archivelog script to oracle host
+  when: log_archive_mode == true
+  template:
+    src: "archivelog.{{ ora_version }}"
+    dest: "{{ installer_dir }}/archivelog.sql"
+  become: true
+  become_user: '{{ oracle_user }}'
+  tags:
+    - enable_arhivelog_copy
+
+- name: Enable database to archive log if log_archive_mode is true
+  when: log_archive_mode == true
+  shell: "source /home/{{ oracle_user }}/.bash_profile && sqlplus -s / as sysdba @{{ installer_dir }}/archivelog.sql"
+  become: true
+  become_user: '{{ oracle_user }}'
+  tags:
+    - enable_arhivelog
+
+- name: Update oratab to start oracle_sid
+  when: db_instance == "SI"
+  lineinfile: 
+    dest: /etc/oratab 
+    regexp: "^{{ oracle_sid }}:{{ oracle_home }}:Y" 
+    line: "{{ oracle_sid }}:{{ oracle_home }}:Y"
+  become: true
+  tags:
+    - set_oratab_startDB
+
+- name: Create DB start/shutdown script for each instance sid
+  template:
+    src: "dbora.{{ ora_version }}"
+    dest: "/etc/init.d/dbora.{{ oracle_sid }}"
+    group: '{{ osdba_group }}'
+    mode: 0750
+  become: true
+  tags:
+    - cre_dbora_script
+
+- name: Create symbolic link to rc0.d to shut down DB
+  ansible.builtin.file:
+    src: "/etc/init.d/dbora.{{ oracle_sid }}"
+    dest: "/etc/rc.d/rc0.d/K01dbora.{{ oracle_sid }}"
+    state: link
+  become: true
+  tags:
+    - lnk_dbora_shut
+
+- name: Create symbolic link to rcX.d to startup DB at runlevel 3 and 5
+  ansible.builtin.file:
+    src: "/etc/init.d/dbora.{{ oracle_sid }}"
+    dest: "/etc/rc.d/rc{{ item }}.d/S99dbora.{{ oracle_sid }}"
+    state: link
+  become: true
+  loop:
+    - 3
+    - 5
+  tags:
+    - lnk_dbora_start
+
+- name: Disable default listener startup from dbstart script
+  ansible.builtin.replace:
+    path: "{{ oracle_home }}/bin/dbstart"
+#    regexp: '^$ORACLE_HOME/bin/lsnrctl start >> $LOG'
+    regexp: '^(?=.*?\bORACLE_HOME\b)(?=.*?\bstart\b)(?=.*?\bLOG\b).*$'
+    replace: '#    $ORACLE_HOME/bin/lsnrctl start >> $LOG 2>&1 &'
+  become: true
+  become_user: '{{ oracle_user }}'
+  tags:
+    - turnoff_default_listener
+
+- name: Reboot Oracle server host
+  reboot: 
+  become: true
+  tags: 
+    - reboot_host
