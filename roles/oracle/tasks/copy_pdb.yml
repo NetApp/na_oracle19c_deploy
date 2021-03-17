@@ -1,0 +1,15 @@
+- name: Copy pdb save state script to oracle host
+  template:
+    src: "save_state.{{ ora_version }}"
+    dest: "{{ installer_dir }}/save_state.sql"
+  become: true
+  become_user: '{{ oracle_user }}'
+  tags:
+    - save_pdb_state
+
+- name: Maintain pdbs open state after a instance restart
+  shell: "source /home/{{ oracle_user }}/.bash_profile && sqlplus -s / as sysdba @{{ installer_dir }}/save_state.sql"
+  become: true
+  become_user: '{{ oracle_user }}'
+  tags:
+    - save_pdb_state

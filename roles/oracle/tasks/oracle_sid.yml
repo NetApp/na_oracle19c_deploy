@@ -1,0 +1,19 @@
+- name: Update oratab to start oracle_sid
+  when: db_instance == "SI"
+  lineinfile: 
+    dest: /etc/oratab 
+    regexp: "^{{ oracle_sid }}:{{ oracle_home }}:Y" 
+    line: "{{ oracle_sid }}:{{ oracle_home }}:Y"
+  become: true
+  tags:
+    - set_oratab_startDB
+
+- name: Create DB start/shutdown script for each instance sid
+  template:
+    src: "dbora.{{ ora_version }}"
+    dest: "/etc/init.d/dbora.{{ oracle_sid }}"
+    group: '{{ osdba_group }}'
+    mode: 0750
+  become: true
+  tags:
+    - cre_dbora_script

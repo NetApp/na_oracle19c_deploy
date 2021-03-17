@@ -1,0 +1,17 @@
+- name: Copy archivelog script to oracle host
+  when: log_archive_mode == true
+  template:
+    src: "archivelog.{{ ora_version }}"
+    dest: "{{ installer_dir }}/archivelog.sql"
+  become: true
+  become_user: '{{ oracle_user }}'
+  tags:
+    - enable_arhivelog_copy
+
+- name: Enable database to archive log if log_archive_mode is true
+  when: log_archive_mode == true
+  shell: "source /home/{{ oracle_user }}/.bash_profile && sqlplus -s / as sysdba @{{ installer_dir }}/archivelog.sql"
+  become: true
+  become_user: '{{ oracle_user }}'
+  tags:
+    - enable_arhivelog

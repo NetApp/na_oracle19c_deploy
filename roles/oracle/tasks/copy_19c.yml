@@ -1,0 +1,26 @@
+#- name: Copy Oracle 19c install file to installer directory
+#  ansible.builtin.copy:
+#    src: "/home/admin/Downloads/{{ installer_archives[0] }}"
+#    dest: '{{ installer_dir }}'
+#  become: true
+#  become_user: '{{ oracle_user }}'
+#  tags:
+#    - copy_19c_installer_file
+
+#- name: Copy DB RU 19.8 file to installer directory
+#  ansible.builtin.copy:
+#    src: "/home/admin/Downloads/{{ installer_archives[1] }}"
+#    dest: '{{ installer_dir }}'
+#  become: true
+#  become_user: '{{ oracle_user }}'
+#  tags:
+#    - copy_db_ru_file
+
+#- name: Copy latest OPatch file to installer directory
+#  ansible.builtin.copy:
+#    src: "/home/admin/Downloads/{{ installer_archives[2] }}"
+#    dest: '{{ installer_dir }}'
+#  become: true
+#  become_user: '{{ oracle_user }}'
+#  tags:
+#    - copy_opatch_file

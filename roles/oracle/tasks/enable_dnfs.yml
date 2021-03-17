@@ -1,0 +1,7 @@
+#- name: Enable oracle dNFS client
+#  command: "chdir={{ oracle_home }}/rdbms/lib make -f ins_rdbms.mk dnfs_on I{{ oracle_home }}/rdbms/lib"
+#  command: "chdir={{ oracle_home }}/rdbms/lib ls"
+#  become: true
+#  become_user: '{{ oracle_user }}'
+#  tags:
+#    - dnfs_on
