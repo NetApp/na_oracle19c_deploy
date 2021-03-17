@@ -39,7 +39,7 @@
      yum:
        name: "/tmp/compat-libcap1-1.10-7.el7.x86_64.rpm"
        state: present
-     disable_gpg_check: yes
+       disable_gpg_check: yes
      become: true
      tags:
       - inst_compat-libcap1-1.10
