@@ -1,0 +1,354 @@
+---
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Configure oracle user env - add oracle_home variable
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+- block:
+    - name: Configure oracle user env - add oracle_home variable
+      lineinfile:
+        dest: "/home/{{ oracle_user }}/.bashrc"
+        line: "export ORACLE_HOME={{ oracle_home }}"
+      become: true
+      become_user: '{{ oracle_user }}'
+      tags:
+        - set_oracle_home
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Configure oracle user env - add oracle_home variable] FAILED. Hints:"
+          - 1. Check the failure error message
+          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
+          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Configure oracle user env - add oracle_sid variable
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+- block:
+    - name: Configure oracle user env - add oracle_sid variable
+      when: db_instance == "SI"
+      lineinfile:
+        dest: "/home/{{ oracle_user }}/.bashrc"
+        line: "export ORACLE_SID={{ oracle_sid }}"
+      become: true
+      become_user: '{{ oracle_user }}'
+      tags:
+        - set_oracle_sid
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Configure oracle user env - add oracle_sid variable] FAILED. Hints:"
+          - 1. Check the failure error message
+          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
+          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Configure oracle user env - add oracle exe to PATH
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+- block:
+    - name: Configure oracle user env - add oracle exe to PATH
+      lineinfile:
+        dest: "/home/{{ oracle_user }}/.bashrc"
+        line: "export PATH=$PATH:$ORACLE_HOME/bin"
+      become: true
+      become_user: '{{ oracle_user }}'
+      tags:
+        - set_oracle_path
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Configure oracle user env - add oracle exe to PATH] FAILED. Hints:"
+          - 1. Check the failure error message
+          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
+          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Generate a target oranfstab file at template dest to work around 'invalid selinux context' issue
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+- block:
+    - name: Generate a target oranfstab file at template dest to work around 'invalid selinux context' issue
+      file:
+        path: "{{ oracle_home }}/dbs/oranfstab"
+        state: touch
+      become: true
+      become_user: '{{ oracle_user }}'
+      tags:
+        - gen_oranfstab
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Generate a target oranfstab file at template dest to work around 'invalid selinux context' issue] FAILED. Hints:"
+          - 1. Check the failure error message
+          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
+          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Generate oranfstab file to setup dnfs volume access
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+- block:
+    - name: Generate oranfstab file to setup dnfs volume access
+      template:
+        src: "dnfs.{{ ora_version }}"
+        dest: "{{ oracle_home }}/dbs/oranfstab"
+      become: true
+      become_user: '{{ oracle_user }}'
+      tags:
+        - gen_oranfstab
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Generate oranfstab file to setup dnfs volume access] FAILED. Hints:"
+          - 1. Check the failure error message
+          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
+          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+#  Enable oracle dNFS client
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+#- block:
+#    - name: Enable oracle dNFS client
+#      command: "chdir={{ oracle_home }}/rdbms/lib make -f ins_rdbms.mk dnfs_on I{{ oracle_home }}/rdbms/lib"
+#      command: "chdir={{ oracle_home }}/rdbms/lib ls"
+#      become: true
+#      become_user: '{{ oracle_user }}'
+#      tags:
+#        - dnfs_on
+#  rescue:
+#    - name: Failure message
+#      debug:
+#        msg:
+#          - "TASK [Enable oracle dNFS client] FAILED. Hints:"
+#          - 1. Check the failure error message
+#          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
+#          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Copy pdb save state script to oracle host
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+- block:
+    - name: Copy pdb save state script to oracle host
+      template:
+        src: "save_state.{{ ora_version }}"
+        dest: "{{ installer_dir }}/save_state.sql"
+      become: true
+      become_user: '{{ oracle_user }}'
+      tags:
+        - save_pdb_state
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Copy pdb save state script to oracle host] FAILED. Hints:"
+          - 1. Check the failure error message
+          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
+          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Maintain pdbs open state after a instance restart
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+- block:
+    - name: Maintain pdbs open state after a instance restart
+      shell: "source /home/{{ oracle_user }}/.bash_profile && sqlplus -s / as sysdba @{{ installer_dir }}/save_state.sql"
+      become: true
+      become_user: '{{ oracle_user }}'
+      tags:
+        - save_pdb_state
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Maintain pdbs open state after a instance restart] FAILED. Hints:"
+          - 1. Check the failure error message
+          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
+          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Copy archivelog script to oracle host
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+- block:
+    - name: Copy archivelog script to oracle host
+      when: log_archive_mode == true
+      template:
+        src: "archivelog.{{ ora_version }}"
+        dest: "{{ installer_dir }}/archivelog.sql"
+      become: true
+      become_user: '{{ oracle_user }}'
+      tags:
+        - enable_arhivelog_copy
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Copy archivelog script to oracle host] FAILED. Hints:"
+          - 1. Check the failure error message
+          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
+          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Enable database to archive log if log_archive_mode is true
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+- block:
+    - name: Enable database to archive log if log_archive_mode is true
+      when: log_archive_mode == true
+      shell: "source /home/{{ oracle_user }}/.bash_profile && sqlplus -s / as sysdba @{{ installer_dir }}/archivelog.sql"
+      become: true
+      become_user: '{{ oracle_user }}'
+      tags:
+        - enable_arhivelog
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Enable database to archive log if log_archive_mode is true] FAILED. Hints:"
+          - 1. Check the failure error message
+          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
+          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Update oratab to start oracle_sid
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+- block:
+    - name: Update oratab to start oracle_sid
+      when: db_instance == "SI"
+      lineinfile:
+        dest: /etc/oratab
+        regexp: "^{{ oracle_sid }}:{{ oracle_home }}:Y"
+        line: "{{ oracle_sid }}:{{ oracle_home }}:Y"
+      become: true
+      tags:
+        - set_oratab_startDB
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Update oratab to start oracle_sid] FAILED. Hints:"
+          - 1. Check the failure error message
+          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
+          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Create DB start/shutdown script for each instance sid
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+- block:
+    - name: Create DB start/shutdown script for each instance sid
+      template:
+        src: "dbora.{{ ora_version }}"
+        dest: "/etc/init.d/dbora.{{ oracle_sid }}"
+        group: '{{ osdba_group }}'
+        mode: 0750
+      become: true
+      tags:
+        - cre_dbora_script
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Create DB start/shutdown script for each instance sid] FAILED. Hints:"
+          - 1. Check the failure error message
+          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
+          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+#  Create symbolic link to rc0.d to shut down DB
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+- block:
+    - name: Create symbolic link to rc0.d to shut down DB
+      ansible.builtin.file:
+        src: "/etc/init.d/dbora.{{ oracle_sid }}"
+        dest: "/etc/rc.d/rc0.d/K01dbora.{{ oracle_sid }}"
+        state: link
+      become: true
+      tags:
+        - lnk_dbora_shut
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Create symbolic link to rc0.d to shut down DB] FAILED. Hints:"
+          - 1. Check the failure error message
+          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
+          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Create symbolic link to rcX.d to startup DB at runlevel 3 and 5
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+- name: Create symbolic link to rcX.d to startup DB at runlevel 3 and 5
+  ansible.builtin.file:
+    src: "/etc/init.d/dbora.{{ oracle_sid }}"
+    dest: "/etc/rc.d/rc{{ item }}.d/S99dbora.{{ oracle_sid }}"
+    state: link
+  become: true
+  loop:
+    - 3
+    - 5
+  tags:
+    - lnk_dbora_start
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Create symbolic link to rcX.d to startup DB at runlevel 3 and 5] FAILED. Hints:"
+          - 1. Check the failure error message
+          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
+          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Disable default listener startup from dbstart script
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+- block:
+    - name: Disable default listener startup from dbstart script
+      ansible.builtin.replace:
+        path: "{{ oracle_home }}/bin/dbstart"
+#    regexp: '^$ORACLE_HOME/bin/lsnrctl start >> $LOG'
+        regexp: '^(?=.*?\bORACLE_HOME\b)(?=.*?\bstart\b)(?=.*?\bLOG\b).*$'
+        replace: '#    $ORACLE_HOME/bin/lsnrctl start >> $LOG 2>&1 &'
+      become: true
+      become_user: '{{ oracle_user }}'
+      tags:
+        - turnoff_default_listener
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Disable default listener startup from dbstart script] FAILED. Hints:"
+          - 1. Check the failure error message
+          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
+          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Reboot Oracle server host
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+- block:
+   - name: Reboot Oracle server host
+     reboot:
+     become: true
+     tags:
+       - reboot_host
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Reboot Oracle server host] FAILED. Hints:"
+          - 1. Check the failure error message
+          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
+          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task

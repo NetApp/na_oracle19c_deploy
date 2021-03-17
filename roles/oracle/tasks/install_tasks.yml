@@ -1,0 +1,332 @@
+---
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Create Folder for Oracle Installation files
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+- block:
+    - name: Create folder for Oracle installation files
+      file:
+        state: directory
+        path: '{{ installation_folder }}'
+        owner: '{{ oracle_user }}'
+        group: '{{ oracle_install_group }}'
+      become: true
+      tags:
+        - create_installation_dir
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Create folder for Oracle installation files] FAILED. Hints:"
+          - 1. Check the failure error message
+          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
+          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Create Folder for installer files
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+- block:
+    - name: Create folder for installer files
+      file:
+        state: directory
+        path: '{{ installer_dir }}'
+        owner: '{{ oracle_user }}'
+        group: '{{ oracle_install_group }}'
+      become: true
+      tags:
+        - create_installer_dir
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Create folder for installer files] FAILED. Hints:"
+          - 1. Check the failure error message
+          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
+          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Copy Oracle 19c install file to installer directory
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+#- block:
+#    - name: Copy Oracle 19c install file to installer directory
+#      ansible.builtin.copy:
+#        src: "/home/admin/Downloads/{{ installer_archives[0] }}"
+#        dest: '{{ installer_dir }}'
+#      become: true
+#      become_user: '{{ oracle_user }}'
+#      tags:
+#        - copy_19c_installer_file
+#  rescue:
+#    - name: Failure message
+#      debug:
+#        msg:
+#          - "TASK [Copy Oracle 19c install file to installer directory] FAILED. Hints:"
+#          - 1. Check the failure error message
+#          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
+#          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Copy DB RU 19.8 file to installer directory
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+#- block:
+#    - name: Copy DB RU 19.8 file to installer directory
+#      ansible.builtin.copy:
+#        src: "/home/admin/Downloads/{{ installer_archives[1] }}"
+#        dest: '{{ installer_dir }}'
+#      become: true
+#      become_user: '{{ oracle_user }}'
+#      tags:
+#        - copy_db_ru_file
+#  rescue:
+#    - name: Failure message
+#      debug:
+#        msg:
+#          - "TASK [Copy DB RU 19.8 file to installer directory] FAILED. Hints:"
+#          - 1. Check the failure error message
+#          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
+#          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Copy latest OPatch file to installer directory
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+#- block:
+#    - name: Copy latest OPatch file to installer directory
+#      ansible.builtin.copy:
+#        src: "/home/admin/Downloads/{{ installer_archives[2] }}"
+#        dest: '{{ installer_dir }}'
+#      become: true
+#      become_user: '{{ oracle_user }}'
+#      tags:
+#        - copy_opatch_file
+#  rescue:
+#    - name: Failure message
+#      debug:
+#        msg:
+#          - "TASK [Copy latest OPatch file to installer directory] FAILED. Hints:"
+#          - 1. Check the failure error message
+#          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
+#          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Unpack Oracle 19c installer files
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+- block:
+    - name: Unpack Oracle 19c installer files
+      ansible.builtin.unarchive:
+        src: "{{ installer_dir }}/{{ installer_archives[0] }}"
+        dest: "{{ installation_folder }}/"
+      remote_src: yes
+      become: true
+      become_user: '{{ oracle_user }}'
+      tags:
+        - unzip_install_archives
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Unpack Oracle 19c installer files] FAILED. Hints:"
+          - 1. Check the failure error message
+          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
+          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Delete existing OPatch directory in oracle home
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+- block:
+    - name: Delete existing OPatch directory in oracle home
+      ansible.builtin.file:
+        path: "{{ oracle_home }}/OPatch"
+        state: absent
+      become: true
+      become_user: '{{ oracle_user }}'
+      tags:
+        - del_exist_opatch_ohome
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Delete existing OPatch directory in oracle home] FAILED. Hints:"
+          - 1. Check the failure error message
+          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
+          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Extract current version of OPatch files - p6880880
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+- block:
+    - name: Extract current version of OPatch files - p6880880
+      ansible.builtin.unarchive:
+        src: "{{ installer_dir }}/{{ installer_archives[2] }}"
+        dest: "{{ oracle_home }}/"
+      remote_src: yes
+      become: true
+      become_user: '{{ oracle_user }}'
+      tags:
+        - unzip_opatch_file_oracle
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Extract current version of OPatch files - p6880880] FAILED. Hints:"
+          - 1. Check the failure error message
+          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
+          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Unpack DB 19.8 RU patch files
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+- block:
+    - name: Unpack DB 19.8 RU patch files
+      ansible.builtin.unarchive:
+        src: "{{ installer_dir }}/{{ installer_archives[1] }}"
+        dest: "{{ installer_dir }}/"
+      remote_src: yes
+      become: true
+      become_user: '{{ oracle_user }}'
+      tags:
+        - unzip_oracle_ru_file
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Unpack DB 19.8 RU patch files] FAILED. Hints:"
+          - 1. Check the failure error message
+          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
+          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Generate a target file at template dest to work around 'invalid selinux context' issue
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+- block:
+    - name: Generate a target file at template dest to work around 'invalid selinux context' issue
+      file:
+        path: "{{ installation_folder }}/db_install.rsp"
+        state: touch
+      become: true
+      become_user: '{{ oracle_user }}'
+      tags:
+        - gen_db_install_rsp
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Generate a target file at template dest to work around 'invalid selinux context' issue] FAILED. Hints:"
+          - 1. Check the failure error message
+          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
+          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Generate the response file for software only installation
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+- block:
+    - name: Generate the response file for software only installation
+      ansible.builtin.template:
+        src: "db_install.rsp.{{ ora_version }}"
+        dest: "{{ installation_folder }}/db_install.rsp"
+      become: true
+      become_user: '{{ oracle_user }}'
+      tags:
+        - gen_db_install_rsp
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Generate the response file for software only installation] FAILED. Hints:"
+          - 1. Check the failure error message
+          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
+          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Set ASSUME_DISTID to OL7
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+- block:
+    - name: Set ASSUME_DISTID to OL7
+      ansible.builtin.replace:
+        path: "{{ oracle_home }}/cv/admin/cvu_config"
+        regexp: '#CV_ASSUME_DISTID=OEL5'
+        replace: 'CV_ASSUME_DISTID=OL7'
+      become: true
+      become_user: '{{ oracle_user }}'
+      tags:
+        - set_assume_distid_oracle
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Set ASSUME_DISTID to OL7] FAILED. Hints:"
+          - 1. Check the failure error message
+          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
+          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Install oracle software 19c
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+- block:
+    - name: Install oracle software 19c
+      when: ora_version == "19c"
+      command: "{{ installation_folder}}/runInstaller -applyRU {{db_patch}} -silent -ignorePrereqFailure -responseFile {{ installation_folder }}/db_install.rsp"
+      become: true
+      become_user: '{{ oracle_user }}'
+      ignore_errors: yes
+      tags:
+        - runinstaller
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Install oracle software 19c] FAILED. Hints:"
+          - 1. Check the failure error message
+          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
+          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Execute Inventory root command
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+- block:
+    - name: Execute Inventory root command
+      command: "{{ inventory_location }}/orainstRoot.sh"
+      become: true
+      tags:
+        - orainstroot_sh
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Execute Inventory root command] FAILED. Hints:"
+          - 1. Check the failure error message
+          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
+          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Execute DB home root command
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+- block:
+    - name: Execute DB home root command
+      command: "{{ oracle_home }}/root.sh"
+      become: true
+      tags:
+        - root_sh
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Execute DB home root command] FAILED. Hints:"
+          - 1. Check the failure error message
+          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
+          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task

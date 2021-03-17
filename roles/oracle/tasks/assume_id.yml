@@ -1,9 +1,0 @@
-- name: Set ASSUME_DISTID to OL7
-  ansible.builtin.replace:
-    path: "{{ oracle_home }}/cv/admin/cvu_config"
-    regexp: '#CV_ASSUME_DISTID=OEL5'
-    replace: 'CV_ASSUME_DISTID=OL7'
-  become: true
-  become_user: '{{ oracle_user }}'
-  tags:
-    - set_assume_distid_oracle

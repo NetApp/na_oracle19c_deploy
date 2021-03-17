@@ -1,0 +1,65 @@
+---
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Generate a target netca.rsp file at template dest to work around 'invalid selinux context' issue
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+- block:
+    - name: Generate a target netca.rsp file at template dest to work around 'invalid selinux context' issue
+      file:
+        path: "{{ installation_folder }}/netca.rsp"
+        state: touch
+      become: true
+      become_user: '{{ oracle_user }}'
+      tags:
+        - gen_netca_rsp
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Generate a target netca.rsp file at template dest to work around 'invalid selinux context' issue] FAILED. Hints:"
+          - 1. Check the failure error message
+          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
+          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Generate listener response file
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+- block:
+    - name: Generate listener response file
+      template:
+        src: "netca.rsp.{{ ora_version }}"
+        dest: "{{ installation_folder }}/netca.rsp"
+      become: true
+      become_user: '{{ oracle_user }}'
+      tags:
+        - gen_netca_rsp
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Generate listener response file] FAILED. Hints:"
+          - 1. Check the failure error message
+          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
+          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+ # ----------------------------------------------------------------------------------------------------------------------
+ # ----------------------------------------------------------------------------------------------------------------------
+ # Create listener using netca
+ # ----------------------------------------------------------------------------------------------------------------------
+ # ----------------------------------------------------------------------------------------------------------------------
+- block:
+    - name: Create listener using netca
+      command: "{{ oracle_home }}/bin/netca -silent -responseFile {{ installation_folder }}/netca.rsp"
+      become: true
+      become_user: '{{ oracle_user }}'
+      tags:
+        - create_listener
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Create listener using netca] FAILED. Hints:"
+          - 1. Check the failure error message
+          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
+          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task

@@ -1,5 +1,0 @@
-- name: Reboot Oracle server host
-  reboot: 
-  become: true
-  tags: 
-    - reboot_host

@@ -1,8 +1,0 @@
-- name: Install oracle software 19c
-  when: ora_version == "19c"
-  command: "{{ installation_folder}}/runInstaller -applyRU {{db_patch}} -silent -ignorePrereqFailure -responseFile {{ installation_folder }}/db_install.rsp"
-  become: true
-  become_user: '{{ oracle_user }}'
-  ignore_errors: yes
-  tags:
-    - runinstaller

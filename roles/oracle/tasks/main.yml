@@ -1,6 +1,7 @@
 ---
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
+# This playbook contains Oracle Install Tasks
 # Create folder for Oracle installation files
 # Create folder for installer files
 # Copy Oracle 19c install file to installer directory
@@ -16,12 +17,82 @@
 # Install oracle software 19c
 # Execute Inventory root command
 # Execute DB home root command
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+- block:
+    - name: Install Tasks for Oracle19c
+      include_tasks: install_tasks.yml
+      tags:
+        - create_installation_dir
+        - create_installer_dir
+        - copy_19c_installer_file
+        - copy_db_ru_file
+        - copy_opatch_file
+        - unzip_install_archives
+        - del_exist_opatch_ohome
+        - unzip_opatch_file_oracle
+        - unzip_oracle_ru_file
+        - gen_db_install_rsp
+        - set_assume_distid_oracle
+        - runinstaller
+        - orainstroot_sh
+        - root_sh
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Install Tasks for Oracle19c] FAILED. Hints:"
+          - 1. Check the failure error message.
+          - 2. Check whether the task file exists.
+          - 3. Check whether the task file name and extension is correct.
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Generate Listeners for Oracle19c
 # Generate a target netca.rsp file at template dest to work around 'invalid selinux context' issue
 # Generate listener response file
 # Create listener using netca
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+- block:
+    - name: Generate Listeners for Oracle19c
+      include_tasks: create_listener.yml
+      tags:
+         - gen_netca_rsp
+         - create_listener
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Generate Listeners for Oracle19c] FAILED. Hints:"
+          - 1. Check the failure error message.
+          - 2. Check whether the task file exists.
+          - 3. Check whether the task file name and extension is correct.
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Create Databse For Oracle19c
 # Generate a target dbca.rsp file at template dest to work around 'invalid selinux context' issue
 # Generate response file for dbca for single instance Oracle setup
 # Create database for single Oracle instance
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+- block:
+    - name: Create Database For Oracle19c
+      include_tasks: create_database.yml
+      tags:
+        - gen_dbca_rsp_si
+        - gen_dbca_rsp_s
+        - exec_dbca_si
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Create Database For Oracle19c] FAILED. Hints:"
+          - 1. Check the failure error message.
+          - 2. Check whether the task file exists.
+          - 3. Check whether the task file name and extension is correct.
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Post Install Tasks for Oracle19c
 # Configure oracle user env - add oracle_home variable
 # Configure oracle user env - add oracle_sid variable
 # Configure oracle user env - add oracle exe to PATH
@@ -38,5 +109,33 @@
 # Create symbolic link to rcX.d to startup DB at runlevel 3 and 5
 # Disable default listener startup from dbstart script
 # Reboot Oracle server host
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+- block:
+    - name: Post Install Tasks for Oracle19c
+      include_tasks: post_install.yml
+      tags:
+        - set_oracle_home
+        - set_oracle_sid
+        - set_oracle_path
+        - gen_oranfstab
+      # - dnfs_on
+        - save_pdb_state
+        - enable_arhivelog_copy
+        - enable_arhivelog
+        - set_oratab_startDB
+        - cre_dbora_script
+        - lnk_dbora_shut
+        - lnk_dbora_start
+        - turnoff_default_listener
+        - reboot_host
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Post Install Tasks for Oracle19c] FAILED. Hints:"
+          - 1. Check the failure error message.
+          - 2. Check whether the task file exists.
+          - 3. Check whether the task file name and extension is correct.
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
