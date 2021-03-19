@@ -1,0 +1,38 @@
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Configure oracle user environment to set SID, ORACLE_HOME, PATH
+# For multiple databases on the same host, environment variables needs to be switched by user for access intended DB
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+- block:
+    - name: Configure oracle user env - add oracle_home variable
+      lineinfile:
+        dest: "/home/{{ oracle_user }}/.bashrc"
+        line: "export ORACLE_HOME={{ oracle_home }}"
+      become: true
+      become_user: '{{ oracle_user }}'
+
+    - name: Configure oracle user env - add oracle_sid variable
+      when: db_instance == "SI"
+      lineinfile:
+        dest: "/home/{{ oracle_user }}/.bashrc"
+        line: "export ORACLE_SID={{ oracle_sid }}"
+      become: true
+      become_user: '{{ oracle_user }}'
+
+    - name: Configure oracle user env - add oracle exe to PATH
+      lineinfile:
+        dest: "/home/{{ oracle_user }}/.bashrc"
+        line: "export PATH=$PATH:$ORACLE_HOME/bin"
+      become: true
+      become_user: '{{ oracle_user }}'
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Oracle env config] FAILED. Hints:"
+          - 1. Check the failure error message.
+          - 2. Check whether the task file exists.
+          - 3. Check whether the task file name and extension is correct.
+  tags:
+    - oracle_env_config

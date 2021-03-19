@@ -1,0 +1,6 @@
+server: ONTAP
+nfs_version: nfsv3
+local: {{ nfs_ip }} path: {{ host_datastores_nfs[0].lif }}
+export: /{{host_datastores_nfs[0].vol_name}} mount: {{mount_points[0]}}
+export: /{{host_datastores_nfs[1].vol_name}} mount: {{mount_points[1]}}
+export: /{{host_datastores_nfs[2].vol_name}} mount: {{mount_points[2]}}

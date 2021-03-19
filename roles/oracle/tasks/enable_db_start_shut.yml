@@ -1,0 +1,61 @@
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Configure to automatically shutdown Oracle database instances and listeners when OS is rebooted.
+# Configure to automatically startup Oracle database instances and listeners when OS is rebooted.
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+- block:
+    - name: Update oratab to start oracle_sid
+      when: db_instance == "SI"
+      lineinfile:
+        dest: /etc/oratab
+        regexp: "^{{ oracle_sid }}:{{ oracle_home }}:Y"
+        line: "{{ oracle_sid }}:{{ oracle_home }}:Y"
+      become: true
+
+    - name: Create DB start/shutdown script for each instance sid
+      template:
+        src: "dbora.{{ ora_version }}"
+        dest: "/etc/init.d/dbora.{{ oracle_sid }}"
+        group: '{{ osdba_group }}'
+        mode: 0750
+      become: true
+
+    - name: Create symbolic link to rc0.d to shut down DB
+      ansible.builtin.file:
+        src: "/etc/init.d/dbora.{{ oracle_sid }}"
+        dest: "/etc/rc.d/rc0.d/K01dbora.{{ oracle_sid }}"
+        state: link
+      become: true
+
+    - name: Create symbolic link to rcX.d to startup DB at runlevel 3 and 5
+      ansible.builtin.file:
+        src: "/etc/init.d/dbora.{{ oracle_sid }}"
+        dest: "/etc/rc.d/rc{{ item }}.d/S99dbora.{{ oracle_sid }}"
+        state: link
+      become: true
+      loop:
+        - 3
+        - 5
+
+    - name: Disable default listener startup from dbstart script
+      ansible.builtin.replace:
+        path: "{{ oracle_home }}/bin/dbstart"
+        regexp: '^(?=.*?\bORACLE_HOME\b)(?=.*?\bstart\b)(?=.*?\bLOG\b).*$'
+        replace: '#    $ORACLE_HOME/bin/lsnrctl start >> $LOG 2>&1 &'
+      become: true
+      become_user: '{{ oracle_user }}'
+
+    - name: Reboot Oracle server host
+      reboot:
+      become: true
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Enable DB auto startup and shutdown between OS reboot] FAILED. Hints:"
+          - 1. Check the failure error message.
+          - 2. Check whether the task file exists.
+          - 3. Check whether the task file name and extension is correct.
+  tags:
+    - enable_db_start_shut

@@ -1,0 +1,30 @@
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Default Oracle instanace is in noarchive mode after initial creation.
+# Archive mode enables online backup of Oracle DBs.
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+- block:
+    - name: Copy archivelog script to oracle host
+      when: log_archive_mode == true
+      template:
+        src: "archivelog.{{ ora_version }}"
+        dest: "{{ installer_dir }}/archivelog.sql"
+      become: true
+      become_user: '{{ oracle_user }}'
+
+    - name: Enable database to archive log if log_archive_mode is true
+      when: log_archive_mode == true
+      shell: "source /home/{{ oracle_user }}/.bash_profile && sqlplus -s / as sysdba @{{ installer_dir }}/archivelog.sql"
+      become: true
+      become_user: '{{ oracle_user }}'
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Enable instance archive mode] FAILED. Hints:"
+          - 1. Check the failure error message.
+          - 2. Check whether the task file exists.
+          - 3. Check whether the task file name and extension is correct.
+  tags:
+    - enable_archive_mode

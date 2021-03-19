@@ -1,0 +1,10 @@
+- name: Oracle Linux Setup and Storage Config for Oracle
+  hosts: oracle
+  gather_facts: False
+  vars_files:
+    - roles/linux/defaults/main.yml    
+    - vars/vars.yml
+  roles:
+    - role: linux
+  tags:
+    - linux_config

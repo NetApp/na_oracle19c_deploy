@@ -1,0 +1,32 @@
+#! /bin/sh 
+# description: Oracle auto start-stop script.
+#
+# Set ORACLE_HOME to be equivalent to the $ORACLE_HOME
+# from which you wish to execute dbstart and dbshut;
+#
+# Set ORA_OWNER to the user id of the owner of the
+# Oracle database in ORACLE_HOME.
+
+export ORACLE_HOME={{ oracle_home }}
+export ORA_OWNER={{ oracle_user }}
+
+case "$1" in
+'start')
+    # Start the Oracle databases:
+    # The following command assumes that the oracle login
+    # will not prompt the user for any values
+    # Remove "&" if you don't want startup as a background process.
+    su - $ORA_OWNER -c "ORACLE_HOME=$ORACLE_HOME;$ORACLE_HOME/bin/lsnrctl start LISTENER.{{ oracle_sid }}" &
+    su - $ORA_OWNER -c "$ORACLE_HOME/bin/dbstart $ORACLE_HOME" &
+    touch /var/lock/subsys/dbora.{{ oracle_sid }}
+    ;;
+
+'stop')
+    # Stop the Oracle databases:
+    # The following command assumes that the oracle login
+    # will not prompt the user for any values
+    su - $ORA_OWNER -c "$ORACLE_HOME/bin/dbshut $ORACLE_HOME" &
+    su - $ORA_OWNER -c "ORACLE_HOME=$ORACLE_HOME;$ORACLE_HOME/bin/lsnrctl stop LISTENER.{{ oracle_sid }}" &
+    rm -f /var/lock/subsys/dbora.{{ oracle_sid }}
+    ;;
+esac

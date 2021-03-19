@@ -2,3 +2,7 @@
 [ontap]
 10.61.184.183
 
+#Oracle hosts
+[oracle]
+rtpora01
+rtpora02

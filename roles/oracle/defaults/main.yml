@@ -1,1 +1,64 @@
 ---
+##########################################################
+### DB default installation and configuraton variables ###
+##########################################################
+
+# Set Oracle version
+ora_version: 19c
+# Set Oracle version number for Oracle home directory
+ora_version_num: 19800
+
+# Installation folder
+installation_folder: '{{ oracle_home }}'
+installer_dir: /tmp/archive
+db_patch: /tmp/archive/31281355
+installer_archives:
+  - "LINUX.X64_193000_db_home.zip"
+  - "p31281355_190000_Linux-x86-64.zip"
+  - "p6880880_190000_Linux-x86-64.zip"
+
+install_option: INSTALL_DB_SWONLY
+inventory_group: '{{ oracle_install_group }}'
+inventory_location: /u01/app/oraInventory
+oracle_home: '{{ oracle_base }}/product/{{ ora_version_num }}/{{ oracle_sid }}'
+db_software_edition: EE
+osdba_group: dba
+osoper_group: oper
+osbackupdba_group: oper
+osdgdba_group: dba
+oskmdba_group: dba
+osracdba_group: dba
+
+# RAC specific
+# ADMIN_MANAGED, POLICY_MANAGED, default is ADMIN_MANAGED
+#rac_config_type: 
+#isracone:
+#racone_servicename:
+#server_pool_name:
+#server_pool_cardinality:
+#node_list: 
+
+# DB options
+# Number of instance: [ SI - single instance | RAC - multiple instance ]
+db_instance: SI 
+db_type: MULTIPURPOSE
+db_template: General_Purpose.dbc
+storage_type: FS
+
+sys_pwd: '{{ initial_pwd_all }}'
+system_pwd: '{{ initial_pwd_all }}'
+pdbadmin_pwd: '{{ initial_pwd_all }}'
+dbsnmp_pwd: '{{ initial_pwd_all }}'
+
+global_dbname: '{{ oracle_sid }}.{{ db_domain }}'
+container_db: true
+pdb_local_undo: true
+character_set: AL32UTF8
+nl_character_set: AL16UTF16
+auto_mem_mgmt: false
+example_schema: false
+db_mgmt_option: DEFAULT
+data_location: '{{ oracle_data }}'
+recovery_location: '{{ oracle_reco }}'
+dbca_rsp: 'dbca.rsp.{{ ora_version }}'
+netca_rsp: 'netca.rsp.{{ ora_version }}'

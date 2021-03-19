@@ -1,0 +1,4 @@
+alter pluggable database {{ pdb_name }}1 save state;
+alter pluggable database {{ pdb_name }}2 save state;
+alter pluggable database {{ pdb_name }}3 save state;
+exit;

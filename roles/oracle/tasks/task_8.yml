@@ -1,6 +1,0 @@
-- name: Create listener using netca
-  command: "{{ oracle_home }}/bin/netca -silent -responseFile {{ installation_folder }}/netca.rsp"
-  become: true
-  become_user: '{{ oracle_user }}'
-  tags:
-    - create_listener
