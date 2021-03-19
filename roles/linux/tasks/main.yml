@@ -1,187 +1,168 @@
 ---
-- name: Create mount points for NFS file systems
-  file: 
-    state: directory 
-    path: "{{ item }}"
-  become: true
-  with_items:
-    - '{{ mount_points }}'
-  tags:
-    - cre_mount_points
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Create mount points for NFS file systems
+# Mount NFS file systems on Oracle hosts
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 
-# Load balance Oracle data storage between two controllers: host1 on controller1, host2 on controller2 so on
-- name: Mount NFS file systems on Oracle hosts
-  mount:
-    path: '{{ item.0 }}'
-    src: "{{ item.1.lif }}:/{{ item.1.vol_name }}"
-    fstype: nfs
-    opts: rw,bg,hard,nointr,rsize=32768,wsize=32768,tcp,vers=3,timeo=600
-    state: mounted
-  become: true
-  with_together:
-    - '{{ mount_points }}'
-    - '{{ host_datastores_nfs }}'
-  tags:
-    - mount_host_datastores
+- block:
+    - name: Create mount points for NFS file systems / Mount NFS file systems on Oracle hosts
+      include_tasks: mount_points.yml
+      tags:
+        - cre_mount_points
+        - mount_host_datastores
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Create mount points for NFS file systems] FAILED. Hints:"
+          - 1. Check the failure error message.
+          - 2. Check whether the task file exists.
+          - 3. Check whether the task file name and extension is correct.
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Install required packages, copy and install rpm
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+      
+- block:
+    - name: Install required packages
+      include_tasks: preinstall_rpm.yml
+      tags:
+        - preinstall_rpm
+        - cp_compat-libcap1-1.10
+        - inst_compat-libcap1-1.10 
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Install required packages, copy and install rpm] FAILED. Hints:"
+          - 1. Check the failure error message.
+          - 2. Check whether the task file exists.
+          - 3. Check whether the task file name and extension is correct.
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Create Oracle base directory
+# Create Oracle data directory
+# Create Oracle recovery directory
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 
-# Install required packages, create oracle user and groups 
-- name: Install preinstall rpm for OL 
-  yum: 
-    name: '{{ preinstall_rpm }}' 
-    state: present
-  become: true
-  tags:
-    - preinstall_rpm
+- block:
+    - name: Create Oracle base directories
+      include_tasks: create_database.yml
+      tags:
+        - oracle_base
+        - oracle_data
+        - oracle_reco
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Create Oracle base directories] FAILED. Hints:"
+          - 1. Check the failure error message.
+          - 2. Check whether the task file exists.
+          - 3. Check whether the task file name and extension is correct.
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Disable transparent hugepages in current system
+# Disable transparent hugepages at reboot
+# Configure Kernel for hugepages
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 
-- name: Copy compat-libcap1-1.10 to Oracle inventory host
-  ansible.builtin.copy:
-    src: compat-libcap1-1.10-7.el7.x86_64.rpm
-    dest: /tmp
-  become: true
-  tags:
-    - cp_compat-libcap1-1.10
+- block:
+    - name: Disable transparent hugepages and configure kernel for hugepages
+      include_tasks: huge_pages.yml
+      tags:
+        - disable_thp
+        - config_hugepages
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Disable transparent hugepages and configure kernel for hugepages] FAILED. Hints:"
+          - 1. Check the failure error message.
+          - 2. Check whether the task file exists.
+          - 3. Check whether the task file name and extension is correct.
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Disable SELinux
+# Disable Firewall Deamon
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 
-# Install compat-libcap1-1.10 to workaround missing compat-libcap1-1.10 in OL 8
-- name: Install compat-libcap1-1.10 from OL 7
-  yum: 
-    name: "/tmp/compat-libcap1-1.10-7.el7.x86_64.rpm"
-    state: present
-    disable_gpg_check: yes
-  become: true
-  tags:
-    - inst_compat-libcap1-1.10 
+- block:
+    - name: Disable firewall deamon/SELinux
+      include_tasks: disable_se.yml
+      tags:
+        - disable_selinux
+        - disable_firewall
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Disable firewall deamon (firewalld)] FAILED. Hints:"
+          - 1. Check the failure error message
+          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
+          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Enable chronyd service
+# Start chronyd service
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 
-- name: Create Oracle base directory
-  file: 
-    state: directory 
-    path: '{{ oracle_base }}' 
-    owner: '{{ oracle_user }}' 
-    group: '{{ oracle_install_group }}'
-  become: true
-  tags:
-    - oracle_base
+- block:
+    - name: Enable chronyd and Start chronyd service
+      include_tasks: enable_chronyd.yml
+      tags:
+        - enable_chronyd
+        - start_chronyd
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Restart chronyd service] FAILED. Hints:"
+          - 1. Check the failure error message
+          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
+          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Increase file descriptor hard limit
+# Increase min stack size
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 
-- name: Create Oracle data directory
-  file: 
-    state: directory 
-    path: '{{ oracle_data }}' 
-    owner: '{{ oracle_user }}' 
-    group: '{{ oracle_install_group }}'
-  become: true
-  tags:
-    - oracle_data
+- block:
+    - name: Increase file descriptor hard limit
+      include_tasks: descriptor_limit.yml
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Increase file descriptor hard limit] FAILED. Hints:"
+          - 1. Check the failure error message
+          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
+          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Create pam.d Session File
+# Enable limits change without reboot
+# Create a pam.d Session non-interactive file
+# Add a line to enable limits change without reboot
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 
-- name: Create Oracle recovery directory
-  file: 
-    state: directory 
-    path: '{{ oracle_reco }}' 
-    owner: '{{ oracle_user }}' 
-    group: '{{ oracle_install_group }}'
-  become: true
-  tags:
-    - oracle_reco
-
-- name: Disable transparent hugepages in current system
-  shell: |
-    echo never > /sys/kernel/mm/transparent_hugepage/enabled
-    echo never > /sys/kernel/mm/transparent_hugepage/defrag
-  become: true
-  tags:
-    - disable_thp
-
-- name: Disable transparent hugepages at reboot
-  lineinfile:
-    path: /etc/rc.local
-    line: |
-      # Disable transparent hugepages
-      if test -f /sys/kernel/mm/transparent_hugepage/enabled; then
-         echo never > /sys/kernel/mm/transparent_hugepage/enabled
-      fi
-      if test -f /sys/kernel/mm/transparent_hugepage/defrag; then
-         echo never > /sys/kernel/mm/transparent_hugepage/defrag
-      fi
-  become: true
-  tags:
-    - disable_thp
-
-- name: Configure kernel for hugepages
-  when: hugepages_nr != None
-  sysctl: 
-    name: vm.nr_hugepages 
-    value: '{{ hugepages_nr }}' 
-    state: present
-  become: true
-  tags:
-    - config_hugepages
-
-- name: Disable SELinux
-  selinux: 
-    state: disabled
-  become: true
-  tags:
-    - disable_selinux
-
-- name: Disable firewall deamon (firewalld)
-  service: 
-    name: firewalld 
-    state: stopped 
-    enabled: no
-  become: true
-  tags:
-    - disable_firewall
-
-- name: Enable chronyd service
-  ansible.builtin.service:
-    name: chronyd
-    enabled: yes
-  become: true
-  tags:
-    - enable_chronyd
-
-- name: Start chronyd service
-  ansible.builtin.service:
-    name: chronyd
-    state: started
-  become: true
-  tags:
-    - start_chronyd
-
-- name: Increase file descriptor hard limit
-  lineinfile:
-    path: /etc/security/limits.conf
-    line: "*               hard    nofile          65536"
-  become: true
-
-- name: Increase min stack size
-  lineinfile:
-    path: /etc/security/limits.conf
-    line: "*               soft    stack           10240"
-  become: true
-
-- name: Create a pam.d session file
-  file:
-    path: /etc/pam.d/common-session
-    state: touch
-    mode: 0644
-  become: true
-
-- name: Add a line to enable limits change without reboot
-  lineinfile:
-    path: /etc/pam.d/common-session
-    regexp: '^session required pam_limits.so'
-    line: "session required pam_limits.so"
-  become: true
-
-- name: Create a pam.d session non-interactive file
-  file:
-    path: /etc/pam.d/common-session-noninteractive
-    state: touch
-    mode: 0644
-  become: true
-
-- name: Add a line to enable limits change without reboot
-  lineinfile:
-    path: /etc/pam.d/common-session-noninteractive
-    regexp: '^session required pam_limits.so'
-    line: "session required pam_limits.so"
-  become: true
+- block:
+    - name:  Create Session Files
+      include_tasks: session_files.yml
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Add a line to enable limits change without reboot] FAILED. Hints:"
+          - 1. Check the failure error message
+          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
+          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
