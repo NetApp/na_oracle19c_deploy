@@ -1,0 +1,35 @@
+---
+#Disable SELinux
+- block:
+   - name: Disable SELinux
+     selinux: 
+       state: disabled
+     become: true
+     tags:
+     - disable_selinux
+  rescue:
+   - name: Failure message
+     debug:
+       msg:
+        - "TASK [Disable SELinux] FAILED. Hints:"
+        - 1. Check the failure error message
+        - 2. Check vars file to ensure there is no discrepancy in the variable declaration
+        - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+  #Disable Firewall Deamon
+- block: 
+   - name: Disable firewall deamon (firewalld)
+     service: 
+       name: firewalld 
+       state: stopped
+       enabled: no
+     become: true
+     tags:
+     - disable_firewall
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Disable firewall deamon (firewalld)] FAILED. Hints:"
+          - 1. Check the failure error message
+          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
+          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task

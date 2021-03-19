@@ -1,0 +1,53 @@
+---
+# Install required packages, create oracle user and groups
+- block:
+   - name: Install preinstall rpm for OL
+     yum:
+       name='{{ preinstall_rpm }}'
+       state=present
+     become: true
+     tags:
+      - preinstall_rpm
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Install preinstall rpm for OL] FAILED. Hints:"
+          - 1. Check the failure error message
+          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
+          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+# Copy over rmp to oracle inventory host
+- block:
+   - name: Copy compat-libcap1-1.10 to Oracle inventory host
+     ansible.builtin.copy:
+       src: compat-libcap1-1.10-7.el7.x86_64.rpm
+       dest: /tmp
+     become: true
+     tags:
+      - cp_compat-libcap1-1.10
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Copy compat-libcap1-1.10 to Oracle inventory host] FAILED. Hints:"
+          - 1. Check the failure error message
+          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
+          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+# Install compat-libcap1-1.10 to workaround missing compat-libcap1-1.10 in OL 8
+- block:
+   - name: Install compat-libcap1-1.10 from OL 7
+     yum:
+       name: "/tmp/compat-libcap1-1.10-7.el7.x86_64.rpm"
+       state: present
+       disable_gpg_check: yes
+     become: true
+     tags:
+      - inst_compat-libcap1-1.10
+  rescue:
+  - name: Failure message
+    debug:
+      msg:
+        - "TASK [Install compat-libcap1-1.10 from OL 7] FAILED. Hints:"
+        - 1. Check the failure error message
+        - 2. Check vars file to ensure there is no discrepancy in the variable declaration
+        - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
