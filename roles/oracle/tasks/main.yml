@@ -1,331 +1,163 @@
 ---
-- name: Create folder for Oracle installation files
-  file:
-    state: directory
-    path: '{{ installation_folder }}'
-    owner: '{{ oracle_user }}'
-    group: '{{ oracle_install_group }}'
-  become: true
-  tags:
-    - create_installation_dir
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# DB software only installation tasks block
+# Execute 19.3 base install and applied 19.8 patch in single installation
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+- block:
+    - name: Oracle software only install
+      include_tasks: oracle_install.yml
+      tags:
+        - software_only_install
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Oracle software only install] FAILED. Hints:"
+          - 1. Check the failure error message.
+          - 2. Check any error message in oracle install logs.
+          - 3. Check whether the task file exists.
+          - 4. Check whether the task file name and extension is correct.
 
-- name: Create folder for installer files
-  file:
-    state: directory
-    path: '{{ installer_dir }}'
-    owner: '{{ oracle_user }}'
-    group: '{{ oracle_install_group }}'
-  become: true
-  tags:
-    - create_installer_dir
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Create Oracle listener using netca configuration utility
+# Create a custome listener identified by instance name and a specific port
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+- block:
+    - name: Create Oracle listener
+      include_tasks: create_listener.yml
+      tags:
+        - create_listener
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Create oracle listener] FAILED. Hints:"
+          - 1. Check the error message.
+          - 2. Check the rsp file configuration on target hosts.
+          - 3. Check whether the task file exists.
+          - 4. Check whether the task file name and extension is correct.
 
-#- name: Copy Oracle 19c install file to installer directory
-#  ansible.builtin.copy:
-#    src: "/home/admin/Downloads/{{ installer_archives[0] }}"
-#    dest: '{{ installer_dir }}'
-#  become: true
-#  become_user: '{{ oracle_user }}'
-#  tags:
-#    - copy_19c_installer_file
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Create Oracle database instance from template using dbca utility
+# Create number of PDBs within the instance container as specified by user
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+- block:
+    - name: Create Oracle database
+      include_tasks: create_database.yml
+      tags:
+        - create_database
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Create Oracle database] FAILED. Hints:"
+          - 1. Check the failure error message.
+          - 2. Check the error message in dbca log file on target hosts.
+          - 2. Check whether the task file exists.
+          - 3. Check whether the task file name and extension is correct.
 
-#- name: Copy DB RU 19.8 file to installer directory
-#  ansible.builtin.copy:
-#    src: "/home/admin/Downloads/{{ installer_archives[1] }}"
-#    dest: '{{ installer_dir }}'
-#  become: true
-#  become_user: '{{ oracle_user }}'
-#  tags:
-#    - copy_db_ru_file
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Configure oracle user environment to set SID, ORACLE_HOME, PATH
+# For multiple databases on the same host, environment variables needs to be switched by user for access intended DB
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+- block:
+    - name: Oracle env config
+      include_tasks: oracle_env_config.yml
+      tags:
+        - oracle_env_config
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Oracle env config] FAILED. Hints:"
+          - 1. Check the failure error message.
+          - 2. Check whether the task file exists.
+          - 3. Check whether the task file name and extension is correct.
 
-#- name: Copy latest OPatch file to installer directory
-#  ansible.builtin.copy:
-#    src: "/home/admin/Downloads/{{ installer_archives[2] }}"
-#    dest: '{{ installer_dir }}'
-#  become: true
-#  become_user: '{{ oracle_user }}'
-#  tags:
-#    - copy_opatch_file
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# PDBs within a DB instance will not automatically start after a bounce 
+# Save PDBs active state will allow PDBs return to its active state after a bounce
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+- block:
+    - name: Save PDB state
+      include_tasks: save_pdb_state.yml
+      tags:
+        - save_pdb_state
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Save PDB state] FAILED. Hints:"
+          - 1. Check the failure error message.
+          - 2. Check whether the task file exists.
+          - 3. Check whether the task file name and extension is correct.
 
-- name: Unpack Oracle 19c installer files
-  ansible.builtin.unarchive:
-    src: "{{ installer_dir }}/{{ installer_archives[0] }}"
-    dest: "{{ installation_folder }}/"
-    remote_src: yes
-  become: true
-  become_user: '{{ oracle_user }}'
-  tags:
-    - unzip_install_archives
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Default Oracle instanace is in noarchive mode after initial creation.
+# Archive mode enables online backup of Oracle DBs.
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+- block:
+    - name: Enable instance archive mode
+      include_tasks: enable_archive_mode.yml
+      tags:
+        - enable_archive_mode
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Enable instance archive mode] FAILED. Hints:"
+          - 1. Check the failure error message.
+          - 2. Check whether the task file exists.
+          - 3. Check whether the task file name and extension is correct.
 
-- name: Delete existing OPatch directory in oracle home
-  ansible.builtin.file:
-    path: "{{ oracle_home }}/OPatch"
-    state: absent
-  become: true
-  become_user: '{{ oracle_user }}'
-  tags:
-    - del_exist_opatch_ohome
-
-- name: Extract current version of OPatch files - p6880880
-  ansible.builtin.unarchive:
-    src: "{{ installer_dir }}/{{ installer_archives[2] }}"
-    dest: "{{ oracle_home }}/"
-    remote_src: yes
-  become: true
-  become_user: '{{ oracle_user }}'
-  tags:
-    - unzip_opatch_file_oracle
-
-- name: Unpack DB 19.8 RU patch files
-  ansible.builtin.unarchive:
-    src: "{{ installer_dir }}/{{ installer_archives[1] }}"
-    dest: "{{ installer_dir }}/"
-    remote_src: yes
-  become: true
-  become_user: '{{ oracle_user }}'
-  tags:
-    - unzip_oracle_ru_file
-
-- name: Generate a target file at template dest to work around 'invalid selinux context' issue
-  file:
-    path: "{{ installation_folder }}/db_install.rsp"
-    state: touch
-  become: true
-  become_user: '{{ oracle_user }}'
-  tags:
-    - gen_db_install_rsp
-
-- name: Generate the response file for software only installation
-  ansible.builtin.template:
-    src: "db_install.rsp.{{ ora_version }}"
-    dest: "{{ installation_folder }}/db_install.rsp"
-  become: true
-  become_user: '{{ oracle_user }}'
-  tags:
-    - gen_db_install_rsp
-
-- name: Set ASSUME_DISTID to OL7
-  ansible.builtin.replace:
-    path: "{{ oracle_home }}/cv/admin/cvu_config"
-    regexp: '#CV_ASSUME_DISTID=OEL5'
-    replace: 'CV_ASSUME_DISTID=OL7'
-  become: true
-  become_user: '{{ oracle_user }}'
-  tags:
-    - set_assume_distid_oracle
-
-- name: Install oracle software 19c
-  when: ora_version == "19c"
-  command: "{{ installation_folder}}/runInstaller -applyRU {{db_patch}} -silent -ignorePrereqFailure -responseFile {{ installation_folder }}/db_install.rsp"
-  become: true
-  become_user: '{{ oracle_user }}'
-  ignore_errors: yes
-  tags:
-    - runinstaller
-
-- name: Execute Inventory root command
-  command: "{{ inventory_location }}/orainstRoot.sh"
-  become: true
-  tags:
-    - orainstroot_sh
-
-- name: Execute DB home root command
-  command: "{{ oracle_home }}/root.sh"
-  become: true
-  tags:
-    - root_sh
-
-- name: Generate a target netca.rsp file at template dest to work around 'invalid selinux context' issue
-  file:
-    path: "{{ installation_folder }}/netca.rsp"
-    state: touch
-  become: true
-  become_user: '{{ oracle_user }}'
-  tags:
-    - gen_netca_rsp
-
-- name: Generate listener response file
-  template:
-    src: "netca.rsp.{{ ora_version }}"
-    dest: "{{ installation_folder }}/netca.rsp"
-  become: true
-  become_user: '{{ oracle_user }}'
-  tags:
-    - gen_netca_rsp
-
-- name: Create listener using netca
-  command: "{{ oracle_home }}/bin/netca -silent -responseFile {{ installation_folder }}/netca.rsp"
-  become: true
-  become_user: '{{ oracle_user }}'
-  tags:
-    - create_listener
-
-- name: Generate a target dbca.rsp file at template dest to work around 'invalid selinux context' issue
-  file:
-    path: "{{ installation_folder }}/dbca.rsp"
-    state: touch
-  become: true
-  become_user: '{{ oracle_user }}'
-  tags:
-    - gen_dbca_rsp_si
-
-- name: Generate response file for dbca for single instance Oracle setup
-  template: 
-    src: "dbca.rsp.{{ ora_version }}" 
-    dest: "{{ installation_folder }}/dbca.rsp"
-  become: true
-  become_user: '{{ oracle_user }}'
-  tags:
-    - gen_dbca_rsp_si
-
-- name: Create database for single Oracle instance
-  command: "{{ oracle_home }}/bin/dbca -silent -createDatabase -responseFile {{ installation_folder }}/dbca.rsp"
-  become: true
-  become_user: '{{ oracle_user }}'
-  tags:
-    - exec_dbca_si
-
-- name: Configure oracle user env - add oracle_home variable
-  lineinfile: 
-    dest: "/home/{{ oracle_user }}/.bashrc" 
-    line: "export ORACLE_HOME={{ oracle_home }}"
-  become: true
-  become_user: '{{ oracle_user }}'
-  tags:
-    - set_oracle_home
-
-- name: Configure oracle user env - add oracle_sid variable 
-  when: db_instance == "SI"
-  lineinfile: 
-    dest: "/home/{{ oracle_user }}/.bashrc" 
-    line: "export ORACLE_SID={{ oracle_sid }}"
-  become: true
-  become_user: '{{ oracle_user }}'
-  tags:
-    - set_oracle_sid
-
-- name: Configure oracle user env - add oracle exe to PATH
-  lineinfile: 
-    dest: "/home/{{ oracle_user }}/.bashrc" 
-    line: "export PATH=$PATH:$ORACLE_HOME/bin"
-  become: true
-  become_user: '{{ oracle_user }}'
-  tags:
-    - set_oracle_path
-
-- name: Generate a target oranfstab file at template dest to work around 'invalid selinux context' issue
-  file:
-    path: "{{ oracle_home }}/dbs/oranfstab"
-    state: touch
-  become: true
-  become_user: '{{ oracle_user }}'
-  tags:
-    - gen_oranfstab
-
-- name: Generate oranfstab file to setup dnfs volume access
-  template:
-    src: "dnfs.{{ ora_version }}"
-    dest: "{{ oracle_home }}/dbs/oranfstab"
-  become: true
-  become_user: '{{ oracle_user }}'
-  tags:
-    - gen_oranfstab
-
-#- name: Enable oracle dNFS client
-#  command: "chdir={{ oracle_home }}/rdbms/lib make -f ins_rdbms.mk dnfs_on I{{ oracle_home }}/rdbms/lib"
-#  command: "chdir={{ oracle_home }}/rdbms/lib ls"
-#  become: true
-#  become_user: '{{ oracle_user }}'
-#  tags:
-#    - dnfs_on
-
-- name: Copy pdb save state script to oracle host
-  template:
-    src: "save_state.{{ ora_version }}"
-    dest: "{{ installer_dir }}/save_state.sql"
-  become: true
-  become_user: '{{ oracle_user }}'
-  tags:
-    - save_pdb_state
-
-- name: Maintain pdbs open state after a instance restart
-  shell: "source /home/{{ oracle_user }}/.bash_profile && sqlplus -s / as sysdba @{{ installer_dir }}/save_state.sql"
-  become: true
-  become_user: '{{ oracle_user }}'
-  tags:
-    - save_pdb_state
-
-- name: Copy archivelog script to oracle host
-  when: log_archive_mode == true
-  template:
-    src: "archivelog.{{ ora_version }}"
-    dest: "{{ installer_dir }}/archivelog.sql"
-  become: true
-  become_user: '{{ oracle_user }}'
-  tags:
-    - enable_arhivelog_copy
-
-- name: Enable database to archive log if log_archive_mode is true
-  when: log_archive_mode == true
-  shell: "source /home/{{ oracle_user }}/.bash_profile && sqlplus -s / as sysdba @{{ installer_dir }}/archivelog.sql"
-  become: true
-  become_user: '{{ oracle_user }}'
-  tags:
-    - enable_arhivelog
-
-- name: Update oratab to start oracle_sid
-  when: db_instance == "SI"
-  lineinfile: 
-    dest: /etc/oratab 
-    regexp: "^{{ oracle_sid }}:{{ oracle_home }}:Y" 
-    line: "{{ oracle_sid }}:{{ oracle_home }}:Y"
-  become: true
-  tags:
-    - set_oratab_startDB
-
-- name: Create DB start/shutdown script for each instance sid
-  template:
-    src: "dbora.{{ ora_version }}"
-    dest: "/etc/init.d/dbora.{{ oracle_sid }}"
-    group: '{{ osdba_group }}'
-    mode: 0750
-  become: true
-  tags:
-    - cre_dbora_script
-
-- name: Create symbolic link to rc0.d to shut down DB
-  ansible.builtin.file:
-    src: "/etc/init.d/dbora.{{ oracle_sid }}"
-    dest: "/etc/rc.d/rc0.d/K01dbora.{{ oracle_sid }}"
-    state: link
-  become: true
-  tags:
-    - lnk_dbora_shut
-
-- name: Create symbolic link to rcX.d to startup DB at runlevel 3 and 5
-  ansible.builtin.file:
-    src: "/etc/init.d/dbora.{{ oracle_sid }}"
-    dest: "/etc/rc.d/rc{{ item }}.d/S99dbora.{{ oracle_sid }}"
-    state: link
-  become: true
-  loop:
-    - 3
-    - 5
-  tags:
-    - lnk_dbora_start
-
-- name: Disable default listener startup from dbstart script
-  ansible.builtin.replace:
-    path: "{{ oracle_home }}/bin/dbstart"
-#    regexp: '^$ORACLE_HOME/bin/lsnrctl start >> $LOG'
-    regexp: '^(?=.*?\bORACLE_HOME\b)(?=.*?\bstart\b)(?=.*?\bLOG\b).*$'
-    replace: '#    $ORACLE_HOME/bin/lsnrctl start >> $LOG 2>&1 &'
-  become: true
-  become_user: '{{ oracle_user }}'
-  tags:
-    - turnoff_default_listener
-
-- name: Reboot Oracle server host
-  reboot: 
-  become: true
-  tags: 
-    - reboot_host
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Oracle direct NFS bypass OS buffer cache to access NFS file system to improve performance. 
+# Oracle dNFS is not enabled by default. The tasks setup the dNFS client and configure dNFS setting.
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+- block:
+    - name: Enable dnfs client 
+      include_tasks: enable_dnfs_client.yml
+      tags:
+        - enable_dnfs_client
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Enable dnfs client] FAILED. Hints:"
+          - 1. Check the failure error message.
+          - 2. Check whether the task file exists.
+          - 3. Check whether the task file name and extension is correct.
+   
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Configure to automatically shutdown Oracle database instances and listeners when OS is rebooted.
+# Configure to automatically startup Oracle database instances and listeners when OS is rebooted.
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+- block:
+    - name: Enable DB auto startup and shutdown between OS reboot
+      include_tasks: enable_db_start_shut.yml
+      tags:
+        - enable_db_start_shut
+  rescue:
+    - name: Failure message
+      debug:
+        msg:
+          - "TASK [Enable DB auto startup and shutdown between OS reboot] FAILED. Hints:"
+          - 1. Check the failure error message.
+          - 2. Check whether the task file exists.
+          - 3. Check whether the task file name and extension is correct.
