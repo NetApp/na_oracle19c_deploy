@@ -9,9 +9,11 @@
       when: db_instance == "SI"
       lineinfile:
         dest: /etc/oratab
-        regexp: "^{{ oracle_sid }}:{{ oracle_home }}:Y"
+        regexp: "^{{ oracle_sid }}:{{ oracle_home }}:N"
         line: "{{ oracle_sid }}:{{ oracle_home }}:Y"
       become: true
+      tags:
+        - ora_update_oratab
 
     - name: Create DB start/shutdown script for each instance sid
       template:

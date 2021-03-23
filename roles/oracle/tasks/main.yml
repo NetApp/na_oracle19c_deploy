@@ -72,7 +72,7 @@
     - name: Oracle env config
       include_tasks: oracle_env_config.yml
       tags:
-        - oracle_env_config
+        - ora_env_config
   rescue:
     - name: Failure message
       debug:
@@ -92,7 +92,7 @@
     - name: Save PDB state
       include_tasks: save_pdb_state.yml
       tags:
-        - save_pdb_state
+        - ora_save_pdb_state
   rescue:
     - name: Failure message
       debug:
@@ -153,6 +153,7 @@
       include_tasks: enable_db_start_shut.yml
       tags:
         - enable_db_start_shut
+        - ora_update_oratab
   rescue:
     - name: Failure message
       debug:
