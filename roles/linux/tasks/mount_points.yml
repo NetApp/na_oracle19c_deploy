@@ -4,7 +4,7 @@
    - name: Create mount points for NFS file systems
      file:
        state=directory
-       path="/{{ item }}"
+       path="{{ item }}"
      become: true
      with_items:
        - '{{ mount_points }}'
