@@ -1,25 +1,25 @@
-nfs_ip: 172.21.126.176
+#nfs_ip: 172.21.126.176
 
 # Oracle db log mode: true or false
-log_archive_mode: true
+#log_archive_mode: true
 
 # Number of pluggable database per container instance identified by sid
 #oracle_sid: cdb2
-pdb_num: 3
-pdb_name: "{{ oracle_sid }}_pdb"
+#pdb_num: 3
+#pdb_name: "{{ oracle_sid }}_pdb"
 
 # CDB listener port, use different listener port for additional CDB on same host
 #listener_port: 1523
 
 # CDB is created with SGA at 75% of memory_limit, MB. Consider how many databases to be hosted on the node and how much ram to be allocated to each DB. The grand total SGA should not exceed 75% available RAM on node.
-memory_limit: 5464
+#memory_limit: 5464
 
 # Set "em_configuration: DBEXPRESS" to install enterprise manager express and choose a unique port from 5500 to 5599 for each sid on the host.
 # Leave them black if em express is not installed.
-em_configuration: DBEXPRESS
+#em_configuration: DBEXPRESS
 #em_express_port: 5501
 
-host_datastores_nfs:
-  - {vol_name: "{{groups.oracle[0]}}_u01", aggr_name: aggr01_node01, lif: 172.21.126.200, size: 25}
-  - {vol_name: "{{groups.oracle[0]}}_u02", aggr_name: aggr01_node01, lif: 172.21.126.200, size: 100}
-  - {vol_name: "{{groups.oracle[0]}}_u03", aggr_name: aggr01_node01, lif: 172.21.126.200, size: 100}
+#host_datastores_nfs:
+#  - {vol_name: "{{groups.oracle[0]}}_u01", aggr_name: aggr01_node01, lif: 172.21.126.200, size: 25}
+#  - {vol_name: "{{groups.oracle[0]}}_u02", aggr_name: aggr01_node01, lif: 172.21.126.200, size: 100}
+#  - {vol_name: "{{groups.oracle[0]}}_u03", aggr_name: aggr01_node01, lif: 172.21.126.200, size: 100}
