@@ -31,7 +31,7 @@
       become: true
       with_together:
           - '{{ mount_points }}'
-          - '{{ volumes_nfs }}'
+          - '{{ host_datastores_nfs }}'
       tags:
         - mount_host_datastores
   rescue:
