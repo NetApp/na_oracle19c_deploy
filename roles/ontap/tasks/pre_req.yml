@@ -14,33 +14,12 @@
         gather_subset: "cluster_identity_info"
         summary: yes
       when: ca_signed_certs|bool
-  tags:
-    - pre_req
-    - ontap_config_svm
-    - ontap_ls_mirror_volumes
-    - ontap_config_job_schedule
-    - ontap_snapmirror_relationship
-    - ontap_unlock_svm_admin
-    - ontap_svm_mgmt_lif
-    - ontap_export_policy_rule
-    - ontap_export_policy_apply
-    - ontap_flexvol_create
-    - ontap_nfs_lif
-  rescue:
-    - name: Failure message
-      debug:
-        msg:
-          - "TASK [Check validity of ONTAP cluster nodes] FAILED. Hints:"
-          - 1. Check the failure error message
-          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
-          - 3. Ensure that there is no residual configuration on the controller that can cause failure of this task
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 # Verify Cluster Node names
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
-- block:
     - name: ONTAP cluster node names
       na_ontap_info:
         hostname: "{{ inventory_hostname }}"
@@ -58,33 +37,12 @@
       set_fact: 
         ontap_nodes_validity: yes
       when: nodes is subset(ontap_info_node_register.ontap_info.cluster_node_info)
-  tags:
-    - pre_req
-    - ontap_config_svm
-    - ontap_ls_mirror_volumes
-    - ontap_config_job_schedule
-    - ontap_snapmirror_relationship
-    - ontap_unlock_svm_admin
-    - ontap_svm_mgmt_lif
-    - ontap_export_policy_rule
-    - ontap_export_policy_apply
-    - ontap_flexvol_create
-    - ontap_nfs_lif
-  rescue:
-    - name: Failure message
-      debug:
-        msg:
-          - "TASK [Check validity of ONTAP cluster nodes] FAILED. Hints:"
-          - 1. Check the failure error message
-          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
-          - 3. Ensure that there is no residual configuration on the controller that can cause failure of this task
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 # Verify data aggregate names
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
-- block:
     - name: ONTAP data aggregate names
       na_ontap_info:
         hostname: "{{ inventory_hostname }}"
@@ -102,33 +60,12 @@
       set_fact: 
         ontap_aggregates_validity: yes
       when: (data_aggregates | map(attribute='aggr_name') | list) is subset(ontap_info_aggregate_register.ontap_info.aggregate_info)
-  tags:
-    - pre_req
-    - ontap_config_svm
-    - ontap_ls_mirror_volumes
-    - ontap_config_job_schedule
-    - ontap_snapmirror_relationship
-    - ontap_unlock_svm_admin
-    - ontap_svm_mgmt_lif
-    - ontap_export_policy_rule
-    - ontap_export_policy_apply
-    - ontap_flexvol_create
-    - ontap_nfs_lif
-  rescue:
-    - name: Failure message
-      debug:
-        msg:
-          - "TASK [Check validity of ONTAP cluster aggregates] FAILED. Hints:"
-          - 1. Check the failure error message
-          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
-          - 3. Ensure that there is no residual configuration on the controller that can cause failure of this task
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 # Verify NFS vlan has been created
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
-- block:
     - name: ONTAP cluster VLAN check
       na_ontap_info:
         hostname: "{{ inventory_hostname }}"
@@ -155,33 +92,12 @@
       set_fact:
         ontap_vlan_validity: yes
       when: (ontap_vlan_check | difference(nodes) | list)|length==0
-  tags:
-    - pre_req
-    - ontap_config_svm
-    - ontap_ls_mirror_volumes
-    - ontap_config_job_schedule
-    - ontap_snapmirror_relationship
-    - ontap_unlock_svm_admin
-    - ontap_svm_mgmt_lif
-    - ontap_export_policy_rule
-    - ontap_export_policy_apply
-    - ontap_flexvol_create
-    - ontap_nfs_lif
-  rescue:
-    - name: Failure message
-      debug:
-        msg:
-          - "TASK [Check validity of VLANs on ifgroups] FAILED. Hints:"
-          - 1. Check the failure error message
-          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
-          - 3. Ensure that there is no residual configuration on the controller that can cause failure of this task
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 # Verify network ports that make up interface group match ontap_vars
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
-- block:
     - name: ONTAP ifgrp ports check
       netapp.ontap.na_ontap_info:
         hostname: "{{ inventory_hostname }}"
@@ -199,33 +115,12 @@
         node_data_ports: "{{ node_data_ports + [ {'node_name': item.value.node, 'ports': item.value.ports.lif_bindable} ] }}"
       with_items: "{{ ontap_ports_intr }}"
       when: (item.value.node in ontap_vlan_check) and (item.value.ifgrp_name in ontap_vlan_ifgrp)
-  tags:
-    - pre_req
-    - ontap_config_svm
-    - ontap_ls_mirror_volumes
-    - ontap_config_job_schedule
-    - ontap_snapmirror_relationship
-    - ontap_unlock_svm_admin
-    - ontap_svm_mgmt_lif
-    - ontap_export_policy_rule
-    - ontap_export_policy_apply
-    - ontap_flexvol_create
-    - ontap_nfs_lif
-  rescue:
-    - name: Failure message
-      debug:
-        msg:
-          - "TASK [Capture ifgroups info] FAILED. Hints:"
-          - 1. Check the failure error message
-          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
-          - 3. Ensure that there is no residual configuration on the controller that can cause failure of this task
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 # Set_fact for the following vars: nfs_lifs, svm_specs, svm_root_volume, svm root_mirror_volumes, nfs_exp_policy
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
-- block:
     - name: Set nfs_lifs variable
       vars:
         nfs_lifs: []
@@ -266,14 +161,6 @@
     - ontap_export_policy_apply
     - ontap_flexvol_create
     - ontap_nfs_lif
-  rescue:
-    - name: Failure message
-      debug:
-        msg:
-          - "TASK [Set variables] FAILED. Hints:"
-          - 1. Check the failure error message
-          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
-          - 3. Ensure that there is no residual configuration on the controller that can cause failure of this task
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------

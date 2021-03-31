@@ -21,22 +21,14 @@
         allow_suid: False
         https: true
         validate_certs: false
-  tags:
-    - ontap_export_policy_rule
-  rescue:
-    - name: Failure message
-      debug:
-        msg:
-          - "TASK [Create ora svm nfs export policy rules] FAILED. Hints:"
-          - 1. Check the failure error message
-          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
-          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+      tags:
+        - ontap_export_policy_rule
+
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 # Add NFS Export Policy to the root volume 
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
-- block:
     - name: Add ora svm nfs export policy to the root volume
       na_ontap_volume:
         hostname: "{{ inventory_hostname }}"
@@ -48,16 +40,8 @@
         vserver: "{{ svm_name }}"
         https: true
         validate_certs: false
-  tags:
-    - ontap_export_policy_apply
-  rescue:
-    - name: Failure message
-      debug:
-        msg:
-          - "TASK [Add ora svm nfs export policy to the root volume] FAILED. Hints:"
-          - 1. Check the failure error message
-          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
-          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+      tags:
+        - ontap_export_policy_apply
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------

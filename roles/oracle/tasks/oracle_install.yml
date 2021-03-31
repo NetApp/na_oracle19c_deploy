@@ -82,14 +82,5 @@
     - name: Execute DB home root command
       command: "{{ oracle_home }}/root.sh"
       become: true
-  rescue:
-    - name: Failure message
-      debug:
-        msg:
-          - "TASK [Oracle software only install] FAILED. Hints:"
-          - 1. Check the failure error message.
-          - 2. Check any error message in oracle install logs.
-          - 3. Check whether the task file exists.
-          - 4. Check whether the task file name and extension is correct.
   tags:
     - software_only_install

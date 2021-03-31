@@ -1,35 +1,19 @@
 ---
 # Enable chronyd service
 - block:
-   - name: Enable chronyd service
-     ansible.builtin.service:
-       name: chronyd
-       enabled: yes
-     become: true
-     tags:
-       - enable_chronyd
-  rescue:
-    - name: Failure message
-      debug:
-        msg:
-          - "TASK [Enable chronyd service] FAILED. Hints:"
-          - 1. Check the failure error message
-          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
-          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+    - name: Enable chronyd service
+      ansible.builtin.service:
+        name: chronyd
+        enabled: yes
+      become: true
+      tags:
+        - enable_chronyd
+
 #Restart chronyd service
-- block:
-   - name: start chronyd service
-     ansible.builtin.service:
-       name: chronyd
-       state: started
-     become: true
-     tags:
-       - start_chronyd
-  rescue:
-    - name: Failure message
-      debug:
-        msg:
-          - "TASK [Start chronyd service] FAILED. Hints:"
-          - 1. Check the failure error message
-          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
-          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+    - name: start chronyd service
+      ansible.builtin.service:
+        name: chronyd
+        state: started
+      become: true
+      tags:
+        - start_chronyd

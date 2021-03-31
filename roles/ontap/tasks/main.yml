@@ -26,14 +26,6 @@
         - ontap_export_policy_apply
         - ontap_flexvol_create
         - ontap_nfs_lif
-  rescue:
-    - name: Failure message
-      debug:
-        msg:
-          - "TASK [Check for ONTAP Pre-requisites] FAILED. Hints:"
-          - 1. Check the failure error message.
-          - 2. Check whether the task file exists.
-          - 3. Check whether the task file name and extension is correct.
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
@@ -50,7 +42,6 @@
 # Create LIF for Oracle SVM Management
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
-- block:
     - name: SVM Setup
       include_tasks: svm_create.yml
       tags:
@@ -60,15 +51,7 @@
         - ontap_snapmirror_relationship
         - ontap_unlock_svm_admin
         - ontap_svm_mgmt_lif  
-  when: ontap_nodes_validity|bool and ontap_aggregates_validity|bool and ontap_vlan_validity|bool
-  rescue: 
-    - name: Failure message
-      debug:
-        msg:
-          - "TASK [SVM Setup] FAILED. Hints:"
-          - 1. Check the failure error message.
-          - 2. Check whether the task file exists.
-          - 3. Check whether the task file name and extension is correct.
+      when: ontap_nodes_validity|bool and ontap_aggregates_validity|bool and ontap_vlan_validity|bool
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
@@ -77,21 +60,12 @@
 # Add NFS export policy to the root volume
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
-- block:
     - name: NFS Exports
       include_tasks: nfs_export_policy.yml
       tags:
         - ontap_export_policy_rule
         - ontap_export_policy_apply
-  when: ontap_nodes_validity|bool and ontap_aggregates_validity|bool and ontap_vlan_validity|bool
-  rescue:
-    - name: Failure message
-      debug:
-        msg:
-          - "TASK [NFS Exports] FAILED. Hints:"
-          - 1. Check the failure error message.
-          - 2. Check whether the task file exists.
-          - 3. Check whether the task file name and extension is correct.
+      when: ontap_nodes_validity|bool and ontap_aggregates_validity|bool and ontap_vlan_validity|bool
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
@@ -99,20 +73,11 @@
 # Create Flexvols for Oracle NFS volumes
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
-- block:
     - name: Flexvols for Oracle Database
       include_tasks: nfs_volume_create.yml
       tags:
         - ontap_flexvol_create
-  when: ontap_nodes_validity|bool and ontap_aggregates_validity|bool and ontap_vlan_validity|bool
-  rescue:
-    - name: Failure message
-      debug:
-        msg:
-          - "TASK [Flexvols for Oracle Datastore] FAILED. Hints:"
-          - 1. Check the failure error message.
-          - 2. Check whether the task file exists.
-          - 3. Check whether the task file name and extension is correct.
+      when: ontap_nodes_validity|bool and ontap_aggregates_validity|bool and ontap_vlan_validity|bool
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
@@ -120,20 +85,11 @@
 # Create two lifs for Oracle NFS volume client access
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
-- block:
     - name: Lifs for Oracle NFS datastores client access
       include_tasks: nfs_lif_create.yml
       tags:
         - ontap_nfs_lif
-  when: ontap_nodes_validity|bool and ontap_aggregates_validity|bool and ontap_vlan_validity|bool
-  rescue:
-    - name: Failure message
-      debug:
-        msg:
-          - "TASK [Lifs for Oracle NFS datastores client access] FAILED. Hints:"
-          - 1. Check the failure error message.
-          - 2. Check whether the task file exists.
-          - 3. Check whether the task file name and extension is correct.
+      when: ontap_nodes_validity|bool and ontap_aggregates_validity|bool and ontap_vlan_validity|bool
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------

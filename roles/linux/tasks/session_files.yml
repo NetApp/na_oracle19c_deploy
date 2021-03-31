@@ -1,65 +1,33 @@
 ---
 #Create pam.d Session File  
 - block:  
-   - name: Create a pam.d session file
-     file:
-       path: /etc/pam.d/common-session
-       state: touch
-       mode: 0644
-     become: true
-  rescue:
-  - name: Failure message
-    debug:
-      msg:
-        - "TASK [Create a pam.d session file] FAILED. Hints:"
-        - 1. Check the failure error message
-        - 2. Check vars file to ensure there is no discrepancy in the variable declaration
-        - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+    - name: Create a pam.d session file
+      file:
+        path: /etc/pam.d/common-session
+        state: touch
+        mode: 0644
+      become: true
+
 #Enable limits change without reboot
-- block:        
-   - name: Add a line to enable limits change without reboot
-     lineinfile:
-       path: /etc/pam.d/common-session
-       regexp: '^session required pam_limits.so'
-       line: "session required pam_limits.so"
-     become: true
-  rescue:
-   - name: Failure message
-     debug:
-       msg:
-         - "TASK [Add a line to enable limits change without reboot] FAILED. Hints:"
-         - 1. Check the failure error message
-         - 2. Check vars file to ensure there is no discrepancy in the variable declaration
-         - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+    - name: Add a line to enable limits change without reboot
+      lineinfile:
+        path: /etc/pam.d/common-session
+        regexp: '^session required pam_limits.so'
+        line: "session required pam_limits.so"
+      become: true
+
 #Create a pam.d session non-interactive file
-- block:
-   - name: Create a pam.d session non-interactive file
-     file:
-       path: /etc/pam.d/common-session-noninteractive
-       state: touch
-       mode: 0644
-     become: true
-  rescue:
-   - name: Failure message
-     debug:
-       msg:
-         - "TASK [Create a pam.d session non-interactive file] FAILED. Hints:"
-         - 1. Check the failure error message
-         - 2. Check vars file to ensure there is no discrepancy in the variable declaration
-         - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+    - name: Create a pam.d session non-interactive file
+      file:
+        path: /etc/pam.d/common-session-noninteractive
+        state: touch
+        mode: 0644
+      become: true
+
 #Add a line to enable limits change without reboot
-- block:
-   - name: Add a line to enable limits change without reboot
-     lineinfile:
-       path: /etc/pam.d/common-session-noninteractive
-       regexp: '^session required pam_limits.so'
-       line: "session required pam_limits.so"
-     become: true
-  rescue:
-    - name: Failure message
-      debug:
-        msg:
-          - "TASK [Add a line to enable limits change without reboot] FAILED. Hints:"
-          - 1. Check the failure error message
-          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
-          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+    - name: Add a line to enable limits change without reboot
+      lineinfile:
+        path: /etc/pam.d/common-session-noninteractive
+        regexp: '^session required pam_limits.so'
+        line: "session required pam_limits.so"
+      become: true

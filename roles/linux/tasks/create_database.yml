@@ -10,16 +10,8 @@
      become: true
      tags:
        - oracle_base
-  rescue:
-  - name: Failure message
-    debug:
-      msg:
-        - "TASK [Create Oracle base directory] FAILED. Hints:"
-        - 1. Check the failure error message
-        - 2. Check vars file to ensure there is no discrepancy in the variable declaration
-        - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+
 #Create Oracle data directory
-- block:
    - name: Create Oracle data directory
      file:
        state: directory
@@ -29,30 +21,14 @@
      become: true
      tags:
        - oracle_data
-  rescue:
-  - name: Failure message
-    debug:
-      msg:
-        - "TASK [Create Oracle data directory] FAILED. Hints:"
-        - 1. Check the failure error message
-        - 2. Check vars file to ensure there is no discrepancy in the variable declaration
-        - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+
 #Create Oracle recovery directory
-- block:
    - name: Create Oracle recovery directory
      file:
        state: directory
        path:  '{{ oracle_reco }}'
        owner: '{{ oracle_user }}'
        group: '{{ oracle_install_group }}'
-  become: true
-  tags:
-    - oracle_reco
-  rescue:
-    - name: Failure message
-      debug:
-        msg:
-          - "TASK [Create Oracle recovery directory] FAILED. Hints:"
-          - 1. Check the failure error message
-          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
-          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+     become: true
+     tags:
+       - oracle_reco

@@ -13,30 +13,10 @@
       with_items:
         - "{{ data_aggregates }}"
       failed_when: item.aggr_name == None or item.aggr_name == ""
-  tags:
-    - ontap_config_svm
-  rescue:
-    - name: Failure message
-      debug:
-        msg:
-          - "TASK [Generate the aggr list variable for Oracle SVM] FAILED. Hints:"
-          - 1. Check the failure error message
-          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
-          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
-
-- block:      
     - name: See the avaialble aggr list
       debug: var=aggr_list 
   tags:
     - ontap_config_svm
-  rescue:
-    - name: Failure message
-      debug:
-        msg:
-          - "TASK [See the avaialble aggr list] FAILED. Hints:"
-          - 1. Check the failure error message
-          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
-          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
@@ -57,23 +37,14 @@
         aggr_list: "{{ aggr_list }}" 
         https: true 
         validate_certs: false
-  tags:
-    - ontap_config_svm
-  rescue:
-    - name: Failure message
-      debug:
-        msg:
-          - "TASK [Create Oracle data SVM with NFS protocols enabled] FAILED. Hints:"
-          - 1. Check the failure error message
-          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
-          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+      tags:
+        - ontap_config_svm
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 # Enable NFS Protocol for SVM
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
-- block:      
     - name: Enable NFS protcol for Oracle SVM
       na_ontap_nfs: 
         hostname: "{{ inventory_hostname }}" 
@@ -86,23 +57,14 @@
         udp: disabled 
         https: true 
         validate_certs: false
-  tags:
-    - ontap_config_svm
-  rescue:
-    - name: Failure message
-      debug:
-        msg:
-          - "TASK [Enable NFS protcol for Oracle SVM] FAILED. Hints:"
-          - 1. Check the failure error message
-          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
-          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+      tags:
+        - ontap_config_svm
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 # Create the load-sharing mirror volumes for the root volume
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
-- block:
     - name: Create the load-sharing mirror volumes for the Oracle root volume
       na_ontap_volume: 
         hostname: "{{ inventory_hostname }}" 
@@ -119,23 +81,14 @@
       with_together:
         - "{{ data_aggregates }}"
         - "{{ root_mirror_volumes }}"
-  tags:
-    - ontap_ls_mirror_volumes      
-  rescue:
-    - name: Failure message
-      debug:
-        msg:
-          - "TASK [Create the load-sharing mirror volumes for the Oracle root volume] FAILED. Hints:"
-          - 1. Check the failure error message
-          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
-          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+      tags:
+        - ontap_ls_mirror_volumes      
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 # Create Job schedule for the root volume snapmirror
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
-- block:
     - name: Create a job schedule for the snapmirror of root volume
       na_ontap_job_schedule: 
         hostname: "{{ inventory_hostname }}" 
@@ -148,23 +101,14 @@
         validate_certs: false
       with_items:
         - "{{ job_schedule }}"
-  tags:
-    - ontap_config_job_schedule
-  rescue:
-    - name: Failure message
-      debug:
-        msg:
-          - "TASK [Create a job schedule for the snapmirror of root volume] FAILED. Hints:"
-          - 1. Check the failure error message
-          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
-          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+      tags:
+        - ontap_config_job_schedule
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 # Create the SnapMirror relationship between root volume and mirror volumes (new format)
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
-#- block:
 #    - name: Create the SnapMirror relationships
 #      na_ontap_snapmirror:
 #        hostname: "{{ inventory_hostname }}"
@@ -183,23 +127,14 @@
 #        validate_certs: false
 #      with_items:
 #        - "{{ root_mirror_volumes }}"
-#  tags:
-#    - ontap_snapmirror_relationship
-#  rescue:
-#    - name: Failure message
-#      debug:
-#        msg:
-#          - "TASK [Create the SnapMirror relationships] FAILED. Hints:"
-#          - 1. Check the failure error message
-#          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
-#          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+#      tags:
+#        - ontap_snapmirror_relationship
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 # Create the SnapMirror relationship between root volume and mirror volumes
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
-- block:
     - name: Create the SnapMirror relationships
       na_ontap_snapmirror:
         hostname: "{{ inventory_hostname }}"
@@ -216,23 +151,14 @@
         validate_certs: false
       with_items:
         - "{{ root_mirror_volumes }}"
-  tags:
-    - ontap_snapmirror_relationship
-  rescue:
-    - name: Failure message
-      debug:
-        msg:
-          - "TASK [Create the SnapMirror relationships] FAILED. Hints:"
-          - 1. Check the failure error message
-          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
-          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+      tags:
+        - ontap_snapmirror_relationship
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 # Initialize the snapmirror relationship
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
-- block:
     - name: Initialize the mirroring relationship
       na_ontap_snapmirror:
         hostname: "{{ inventory_hostname }}"
@@ -245,21 +171,12 @@
         validate_certs: false
       with_items:
         - "{{ root_mirror_volumes }}"
-  tags:
-    - ontap_snapmirror_relationship
-  rescue:
-    - name: Failure message
-      debug:
-        msg:
-          - "TASK [Initialize the mirroring relationship] FAILED. Hints:"
-          - 1. Check the failure error message
-          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
-          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+      tags:
+        - ontap_snapmirror_relationship
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 # Initialize the mirroring relationship
-#- block:
 #    - name: Initialize the mirroring relationship
 #      na_ontap_snapmirror:
 #        hostname: "{{ inventory_hostname }}"
@@ -274,23 +191,14 @@
 #        validate_certs: false
 #      with_items:
 #        - "{{ root_mirror_volumes }}"
-#  tags:
-#    - ontap_snapmirror_relationship
-#  rescue:
-#    - name: Failure message
-#      debug:
-#        msg:
-#          - "TASK [Initialize the mirroring relationship] FAILED. Hints:"
-#          - 1. Check the failure error message
-#          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
-#          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+#      tags:
+#        - ontap_snapmirror_relationship
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 # Set the password for vsadmin first. Account cannot be unlocked without password
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
-- block:
     - name: Set password for vsadmin user
       na_ontap_user:
         hostname: "{{ inventory_hostname }}"
@@ -306,23 +214,14 @@
         set_password: "{{ vsadmin_password }}"
         https: true
         validate_certs: false
-  tags:
-    - ontap_unlock_svm_admin
-  rescue:
-    - name: Failure message
-      debug:
-        msg:
-          - "TASK [Set password for vsadmin user] FAILED. Hints:"
-          - 1. Check the failure error message
-          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
-          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+      tags:
+        - ontap_unlock_svm_admin
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 # Unlock vsadmin user (This is the SVM admin account)
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
-- block:
     - name: Unlock vsadmin user
       na_ontap_user:
         hostname: "{{ inventory_hostname }}"
@@ -337,23 +236,14 @@
         name: vsadmin
         https: true
         validate_certs: false
-  tags:
-    - ontap_unlock_svm_admin
-  rescue:
-    - name: Failure message
-      debug:
-        msg:
-          - "TASK [Unlock vsadmin user] FAILED. Hints:"
-          - 1. Check the failure error message
-          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
-          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+      tags:
+        - ontap_unlock_svm_admin
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 # Create LIF for SVM Management            
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
-- block:      
     - name: Create LIF for Oracle SVM Management
       na_ontap_interface:
         hostname: "{{ inventory_hostname }}" 
@@ -376,16 +266,8 @@
         validate_certs: false
       with_items:
         - "{{ svm_specs }}"
-  tags:
-    - ontap_svm_mgmt_lif
-  rescue:
-    - name: Failure message
-      debug:
-        msg:
-          - "TASK [Create LIF for Oracle SVM Management] FAILED. Hints:"
-          - 1. Check the failure error message
-          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
-          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+      tags:
+        - ontap_svm_mgmt_lif
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------	  

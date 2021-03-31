@@ -1,26 +1,17 @@
 ---
 # NFS Specific Mount Points
 - block:
-   - name: Create mount points for NFS file systems
-     file:
-       state=directory
-       path="{{ item }}"
-     become: true
-     with_items:
-       - '{{ mount_points }}'
-     tags:
-       - cre_mount_points
-  rescue:
-    - name: Failure message
-      debug:
-        msg:
-          - "TASK [Create mount points for NFS file systems] FAILED. Hints:"
-          - 1. Check the failure error message
-          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
-          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+    - name: Create mount points for NFS file systems
+      file:
+        state=directory
+        path="{{ item }}"
+      become: true
+      with_items:
+        - '{{ mount_points }}'
+      tags:
+        - cre_mount_points
 
 # NFS Specific, Load Balance Oracle Data stores between two controllers: host1 on controller1, host2 on controller2 so on
-- block:
     - name: Mount NFS file systems on Oracle hosts
       mount:
         path: '{{ item.0 }}'
@@ -34,11 +25,3 @@
           - '{{ host_datastores_nfs }}'
       tags:
         - mount_host_datastores
-  rescue:
-    - name: Failure message
-      debug:
-        msg:
-          - "TASK [Mount NFS file systems on Oracle hosts] FAILED. Hints:"
-          - 1. Check the failure error message
-          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
-          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
