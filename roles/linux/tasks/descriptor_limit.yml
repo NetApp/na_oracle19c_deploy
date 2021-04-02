@@ -6,26 +6,10 @@
        path: /etc/security/limits.conf
        line: "*               hard    nofile          65536"
      become: true
-  rescue:
-  - name: Failure message
-    debug:
-      msg:
-        - "TASK [Increase file descriptor hard limit] FAILED. Hints:"
-        - 1. Check the failure error message
-        - 2. Check vars file to ensure there is no discrepancy in the variable declaration
-        - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+
 #Increase min stack size
-- block:
    - name: Increase min stack size
      lineinfile:
        path: /etc/security/limits.conf
        line: "*               soft    stack           10240"
      become: true
-  rescue:
-    - name: Failure message
-      debug:
-        msg:
-          - "TASK [Increase min stack size] FAILED. Hints:"
-          - 1. Check the failure error message
-          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
-          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task

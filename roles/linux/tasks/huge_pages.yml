@@ -1,61 +1,37 @@
 ---
 #Disable transparent hugepages in current system
 - block:
-   - name: Disable transparent hugepages in current system
-     shell: |
-      echo never > /sys/kernel/mm/transparent_hugepage/enabled
-      echo never > /sys/kernel/mm/transparent_hugepage/defrag
-     become: true
-     tags:
-      - disable_thp
-  rescue:
-  - name: Failure message
-    debug:
-      msg:
-        - "TASK [Disable transparent hugepages in current system] FAILED. Hints:"
-        - 1. Check the failure error message
-        - 2. Check vars file to ensure there is no discrepancy in the variable declaration
-        - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+    - name: Disable transparent hugepages in current system
+      shell: |
+        echo never > /sys/kernel/mm/transparent_hugepage/enabled
+        echo never > /sys/kernel/mm/transparent_hugepage/defrag
+      become: true
+      tags:
+        - disable_thp
+
 #Disable transparent hugepages at reboot
-- block:
-   - name: Disable transparent hugepages at reboot
-     lineinfile:
-       path: /etc/rc.local
-       line: |
-         # Disable transparent hugepages
-         if test -f /sys/kernel/mm/transparent_hugepage/enabled; then
+    - name: Disable transparent hugepages at reboot
+      lineinfile:
+        path: /etc/rc.local
+        line: |
+          # Disable transparent hugepages
+          if test -f /sys/kernel/mm/transparent_hugepage/enabled; then
             echo never > /sys/kernel/mm/transparent_hugepage/enabled
-         fi
-         if test -f /sys/kernel/mm/transparent_hugepage/defrag; then
+          fi
+          if test -f /sys/kernel/mm/transparent_hugepage/defrag; then
             echo never > /sys/kernel/mm/transparent_hugepage/defrag
-         fi
-     become: true
-     tags:
-      - disable_thp
-  rescue:
-  - name: Failure message
-    debug:
-      msg:
-        - "TASK [Disable transparent hugepages at reboot] FAILED. Hints:"
-        - 1. Check the failure error message
-        - 2. Check vars file to ensure there is no discrepancy in the variable declaration
-        - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+          fi
+      become: true
+      tags:
+        - disable_thp
+
 #Configure Kernel for hugepages
-- block:
-   - name: Configure kernel for hugepages
-     when: hugepages_nr != None
-     sysctl:
-       name: vm.nr_hugepages
-       value: '{{ hugepages_nr }}'
-       state: present
-     become: true
-     tags:
-      - config_hugepages
-  rescue:
-    - name: Failure message
-      debug:
-        msg:
-          - "TASK [Configure kernel for hugepages] FAILED. Hints:"
-          - 1. Check the failure error message
-          - 2. Check vars file to ensure there is no discrepancy in the variable declaration
-          - 3. Ensure that there is no residual configuration on the switch that can cause failure of this task
+    - name: Configure kernel for hugepages
+      when: hugepages_nr != None
+      sysctl:
+        name: vm.nr_hugepages
+        value: '{{ hugepages_nr }}'
+        state: present
+      become: true
+      tags:
+        - config_hugepages

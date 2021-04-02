@@ -10,15 +10,6 @@
       include_tasks: oracle_install.yml
       tags:
         - software_only_install
-  rescue:
-    - name: Failure message
-      debug:
-        msg:
-          - "TASK [Oracle software only install] FAILED. Hints:"
-          - 1. Check the failure error message.
-          - 2. Check any error message in oracle install logs.
-          - 3. Check whether the task file exists.
-          - 4. Check whether the task file name and extension is correct.
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
@@ -26,20 +17,10 @@
 # Create a custome listener identified by instance name and a specific port
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
-- block:
     - name: Create Oracle listener
       include_tasks: create_listener.yml
       tags:
         - create_listener
-  rescue:
-    - name: Failure message
-      debug:
-        msg:
-          - "TASK [Create oracle listener] FAILED. Hints:"
-          - 1. Check the error message.
-          - 2. Check the rsp file configuration on target hosts.
-          - 3. Check whether the task file exists.
-          - 4. Check whether the task file name and extension is correct.
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
@@ -47,20 +28,10 @@
 # Create number of PDBs within the instance container as specified by user
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
-- block:
     - name: Create Oracle database
       include_tasks: create_database.yml
       tags:
         - create_database
-  rescue:
-    - name: Failure message
-      debug:
-        msg:
-          - "TASK [Create Oracle database] FAILED. Hints:"
-          - 1. Check the failure error message.
-          - 2. Check the error message in dbca log file on target hosts.
-          - 2. Check whether the task file exists.
-          - 3. Check whether the task file name and extension is correct.
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
@@ -68,19 +39,10 @@
 # For multiple databases on the same host, environment variables needs to be switched by user for access intended DB
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
-- block:
     - name: Oracle env config
       include_tasks: oracle_env_config.yml
       tags:
         - ora_env_config
-  rescue:
-    - name: Failure message
-      debug:
-        msg:
-          - "TASK [Oracle env config] FAILED. Hints:"
-          - 1. Check the failure error message.
-          - 2. Check whether the task file exists.
-          - 3. Check whether the task file name and extension is correct.
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
@@ -88,19 +50,10 @@
 # Save PDBs active state will allow PDBs return to its active state after a bounce
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
-- block:
     - name: Save PDB state
       include_tasks: save_pdb_state.yml
       tags:
         - ora_save_pdb_state
-  rescue:
-    - name: Failure message
-      debug:
-        msg:
-          - "TASK [Save PDB state] FAILED. Hints:"
-          - 1. Check the failure error message.
-          - 2. Check whether the task file exists.
-          - 3. Check whether the task file name and extension is correct.
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
@@ -108,19 +61,10 @@
 # Archive mode enables online backup of Oracle DBs.
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
-- block:
     - name: Enable instance archive mode
       include_tasks: enable_archive_mode.yml
       tags:
         - enable_archive_mode
-  rescue:
-    - name: Failure message
-      debug:
-        msg:
-          - "TASK [Enable instance archive mode] FAILED. Hints:"
-          - 1. Check the failure error message.
-          - 2. Check whether the task file exists.
-          - 3. Check whether the task file name and extension is correct.
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
@@ -128,37 +72,19 @@
 # Oracle dNFS is not enabled by default. The tasks setup the dNFS client and configure dNFS setting.
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
-- block:
     - name: Enable dnfs client 
       include_tasks: enable_dnfs_client.yml
       tags:
         - enable_dnfs_client
-  rescue:
-    - name: Failure message
-      debug:
-        msg:
-          - "TASK [Enable dnfs client] FAILED. Hints:"
-          - 1. Check the failure error message.
-          - 2. Check whether the task file exists.
-          - 3. Check whether the task file name and extension is correct.
-   
+
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 # Configure to automatically shutdown Oracle database instances and listeners when OS is rebooted.
 # Configure to automatically startup Oracle database instances and listeners when OS is rebooted.
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
-- block:
     - name: Enable DB auto startup and shutdown between OS reboot
       include_tasks: enable_db_start_shut.yml
       tags:
         - enable_db_start_shut
         - ora_update_oratab
-  rescue:
-    - name: Failure message
-      debug:
-        msg:
-          - "TASK [Enable DB auto startup and shutdown between OS reboot] FAILED. Hints:"
-          - 1. Check the failure error message.
-          - 2. Check whether the task file exists.
-          - 3. Check whether the task file name and extension is correct.

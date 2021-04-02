@@ -18,13 +18,5 @@
       shell: "source /home/{{ oracle_user }}/.bash_profile && sqlplus -s / as sysdba @{{ installer_dir }}/archivelog.sql"
       become: true
       become_user: '{{ oracle_user }}'
-  rescue:
-    - name: Failure message
-      debug:
-        msg:
-          - "TASK [Enable instance archive mode] FAILED. Hints:"
-          - 1. Check the failure error message.
-          - 2. Check whether the task file exists.
-          - 3. Check whether the task file name and extension is correct.
   tags:
     - enable_archive_mode
