@@ -1,7 +1,7 @@
 - name: ONTAP Setup and Storage Config for Oracle
   collections:
     - netapp.ontap
-  hosts: "{{ hosts | default ('ontap') }}"
+  hosts: "{{ hosts_group | default ('ontap') }}"
   connection: local
   gather_facts: False
   vars_files:
