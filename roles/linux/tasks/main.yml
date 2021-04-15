@@ -15,13 +15,48 @@
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
+# RedHat Linux 7 specific configuration
+# Register subscrtipion and install preinstall rpm for Oracle DB
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+    - name: Configure RedHat 7 for Oracle DB installation
+      when: ansible_facts ['distribution'] == "RedHat" and ansible_facts ['distribution_major_version'] == "7"
+      include_tasks: rhel7_config.yml
+      tags:
+        - register_subscription_el7
+        - enable_optional_rpms_el7
+        - cp_preinstall-19c_rpm_el7
+        - inst_preinstall-19c_rpm_el7
+        - inst_compat-libstdc++-33
+        - inst_gcc-c++
+
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# RedHat Linux 8 specific configuration
+# Register subscrtipion and install preinstall rpm for Oracle DB
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+    - name: Configure RedHat 8 for Oracle DB installation
+      when: ansible_facts ['distribution'] == "RedHat" and ansible_facts ['distribution_major_version'] == "8" 
+      include_tasks: rhel8_config.yml
+      tags:
+        - register_subscription_el8
+        - cp_preinstall-19c_rpm_el8
+        - inst_preinstall-19c_rpm_el8
+        - cp_compat-libcap1-1.10_el8
+        - inst_compat-libcap1-1.10_el8
+
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Oracle Linux specific configuration
 # Install required packages, copy and install rpm
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
-    - name: Install required packages
-      include_tasks: preinstall_rpm.yml
+    - name: Configure Oracle Linux for Oracle DB installation
+      when: ansible_facts ['distribution'] == "OracleLinux"
+      include_tasks: ol_config.yml
       tags:
-        - preinstall_rpm
+        - inst_preinstall-19c_rpm
         - cp_compat-libcap1-1.10
         - inst_compat-libcap1-1.10 
 
@@ -33,7 +68,7 @@
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
     - name: Create Oracle base directories
-      include_tasks: create_database.yml
+      include_tasks: create_database_dir.yml
       tags:
         - oracle_base
         - oracle_data

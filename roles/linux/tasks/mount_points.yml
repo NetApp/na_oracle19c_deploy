@@ -17,7 +17,7 @@
         path: '{{ item.0 }}'
         src: "{{ item.1.lif }}:/{{ item.1.vol_name }}"
         fstype: nfs
-        opts: rw,bg,hard,nointr,rsize=32768,wsize=32768,tcp,vers=3,timeo=600
+        opts: "rw,bg,hard,nointr,rsize=32768,wsize=32768,tcp,vers=3,timeo=600"
         state: mounted
       become: true
       with_together:

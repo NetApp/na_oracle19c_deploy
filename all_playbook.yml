@@ -19,7 +19,7 @@
 
 - name: Oracle Linux Setup and Storage Config for Oracle
   hosts: oracle
-  gather_facts: False
+  gather_facts: True
   vars_files:
     - roles/linux/defaults/main.yml
     - vars/vars.yml
@@ -30,7 +30,7 @@
 
 - name: Oracle installation and configuration
   hosts: oracle
-  gather_facts: False
+  gather_facts: True
   vars_files:
     - roles/oracle/defaults/main.yml
     - roles/linux/defaults/main.yml

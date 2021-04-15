@@ -23,3 +23,7 @@ nfs_lifs_defaults:
 data_protocol: nfs
 
 #nfs_exp_policy: "{{ svm_name }}_client"
+
+#Job Schedule
+job_schedule:
+  - {job_name: 15min,job_minutes: 15}
