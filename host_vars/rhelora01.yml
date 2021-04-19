@@ -1,7 +1,6 @@
 ---
 # Oracle db log mode: true or false
 #log_archive_mode: true
-
 # Number of pluggable database per container instance identified by sid
 #oracle_sid: cdb2
 #pdb_num: 3
