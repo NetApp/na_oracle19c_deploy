@@ -5,18 +5,10 @@
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 - block:
-    - name: Configure oracle user env - add oracle_sid variable
-      when: db_instance == "SI"
+    - name: Configure oracle user env - add oracle_sid, oracle_home and path variables
       lineinfile:
         dest: "/home/{{ oracle_user }}/.bash_profile"
-        line: "export ORACLE_SID={{ oracle_sid }}"
-      become: true
-      become_user: '{{ oracle_user }}'
-
-    - name: Configure oracle user env - add oracle_home and path variable
-      lineinfile:
-        dest: "/home/{{ oracle_user }}/.bash_profile"
-        line: "export ORACLE_HOME={{ oracle_home }};PATH=$PATH:$ORACLE_HOME/bin"
+        line: "export ORACLE_SID={{ oracle_sid }}; export ORACLE_HOME={{ oracle_home }};PATH=$PATH:$ORACLE_HOME/bin"
       become: true
       become_user: '{{ oracle_user }}'
   tags:

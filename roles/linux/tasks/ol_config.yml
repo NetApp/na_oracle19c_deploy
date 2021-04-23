@@ -7,7 +7,7 @@
        state=present
      become: true
      tags:
-      - preinstall_rpm
+      - inst_preinstall-19c_rpm
 
 # Copy over rmp to oracle inventory host
    - name: Copy compat-libcap1-1.10 to Oracle inventory host

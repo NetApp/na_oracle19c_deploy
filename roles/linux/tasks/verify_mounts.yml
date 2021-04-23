@@ -1,0 +1,18 @@
+# Verify whether NFS shares have been mounted correctly!
+- block:
+    - name: Verify NFS Mounts
+      command: nfsstat --mounts
+      become: true
+      register: result
+      tags:
+        - verify_nfs_mounts
+
+    - name:
+      fail:
+        msg: NFS shares not mounted correctly!
+      when: '"{{ item.0 }} from {{ item.1.lif }}:/{{ item.1.vol_name }}" not in result.stdout'
+      with_together:
+        - "{{ mount_points }}"
+        - "{{ host_datastores_nfs }}"
+      tags:
+        - verify_nfs_mounts

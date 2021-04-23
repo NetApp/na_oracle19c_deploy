@@ -1,0 +1,53 @@
+---
+- block:
+# Register RedHat subscription linked to a user account
+    - name: Register subscriptions for RedHat Server
+      community.general.redhat_subscription:
+        state: present
+        username: '{{ redhat_sub_username }}'
+        password: '{{ redhat_sub_password }}'
+        auto_attach: true
+      become: true
+      tags:
+        - register_subscription_el7
+
+    - name: Enable rhel-7-server optional rpms
+      community.general.rhsm_repository:
+        name: rhel-7-server-optional-rpms
+        state: enabled
+      become: true
+      tags:
+        - enable_optional_rpms_el7
+
+    - name: Copy Oracle 19c preinstall rpm file to Oracle inventory host
+      ansible.builtin.copy:
+        src: "oracle-database-preinstall-19c-1.0-3.el7.x86_64.rpm"
+        dest: /tmp
+      become: true
+      tags:
+        - cp_preinstall-19c_rpm_el7
+
+    - name: Install Oracle 19c preinstall rpm on Oracle inventory host
+      yum:
+        name: "/tmp/oracle-database-preinstall-19c-1.0-3.el7.x86_64.rpm"
+        state: present 
+        disable_gpg_check: yes
+      become: true
+      tags: 
+        - inst_preinstall-19c_rpm_el7
+
+    - name: Install compat-libstdc++-33 package
+      yum:
+        name: "compat-libstdc++-33"
+        state: present
+      become: true
+      tags:
+        - inst_compat-libstdc++-33
+
+    - name: Install gcc-c++ package
+      yum:
+        name: "gcc-c++"
+        state: present
+      become: true
+      tags:
+        - inst_gcc-c++

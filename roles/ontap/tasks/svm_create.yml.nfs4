@@ -1,0 +1,326 @@
+---
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Generate an Aggreate list to use for the SVM Creation
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+- vars:
+    aggr_list: []
+  block:
+    - name: Generate the aggr list variable for Oracle SVM
+      set_fact:
+        aggr_list: "{{ aggr_list + [item.aggr_name] }}"
+      with_items:
+        - "{{ data_aggregates }}"
+      failed_when: item.aggr_name == None or item.aggr_name == ""
+    - name: See the avaialble aggr list
+      debug: var=aggr_list 
+  tags:
+    - ontap_config_svm
+
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Create SVM with NFS protocol
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+- block:      
+    - name: Create Oracle data SVM with NFS protocols enabled
+      na_ontap_svm: 
+        hostname: "{{ inventory_hostname }}" 
+        username: "{{ username }}"
+        password: "{{ password }}" 
+        state: present 
+        name: "{{ svm_name }}"
+        root_volume: "{{ svm_name }}_root"
+        root_volume_aggregate: "{{ data_aggregates[0].aggr_name }}"
+        root_volume_security_style: unix 
+        aggr_list: "{{ aggr_list }}" 
+        https: true 
+        validate_certs: false
+      tags:
+        - ontap_config_svm
+
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Enable NFS Protocol version 3 for SVM
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+    - name: Enable NFS protcol 3 for Oracle SVM
+      when: nfs_version == 3
+      na_ontap_nfs: 
+        hostname: "{{ inventory_hostname }}" 
+        username: "{{ username }}" 
+        password: "{{ password }}" 
+        state: present 
+        vserver: "{{ svm_name }}" 
+        vstorage_state: enabled 
+        service_state: started
+        nfsv3: enabled
+        nfsv4: disabled
+        nfsv41: disabled
+        udp: disabled 
+        https: true 
+        validate_certs: false
+      tags:
+        - ontap_config_svm
+
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Enable NFS Protocol version 4 for SVM
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+    - name: Enable NFS protcol 4 for Oracle SVM
+      when: nfs_version == 4
+      na_ontap_nfs:
+        hostname: "{{ inventory_hostname }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+        state: present
+        vserver: "{{ svm_name }}"
+        vstorage_state: enabled
+        service_state: started
+        nfsv3: disabled
+        nfsv4: enabled
+        nfsv41: disabled
+        udp: disabled
+        https: true
+        validate_certs: false
+      tags:
+        - ontap_config_svm
+
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Enable NFS Protocol version 4.1 for SVM
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+    - name: Enable NFS protcol 4.1 for Oracle SVM
+      when: nfs_version == 41
+      na_ontap_nfs:
+        hostname: "{{ inventory_hostname }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+        state: present
+        vserver: "{{ svm_name }}"
+        vstorage_state: enabled
+        service_state: started
+        nfsv3: disabled
+        nfsv4: disabled
+        nfsv41: enabled
+        udp: disabled
+        https: true
+        validate_certs: false
+      tags:
+        - ontap_config_svm
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Create the load-sharing mirror volumes for the root volume
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+    - name: Create the load-sharing mirror volumes for the Oracle root volume
+      na_ontap_volume: 
+        hostname: "{{ inventory_hostname }}" 
+        username: "{{ username }}" 
+        password: "{{ password }}" 
+        state: present 
+        vserver: "{{ svm_name }}"
+        name: "{{ item.1.root_mirror_volume }}"
+        aggregate_name: "{{ item.0.aggr_name }}" 
+        size: 1 
+        type: DP 
+        https: true 
+        validate_certs: false
+      with_together:
+        - "{{ data_aggregates }}"
+        - "{{ root_mirror_volumes }}"
+      tags:
+        - ontap_ls_mirror_volumes      
+
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Create Job schedule for the root volume snapmirror
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+    - name: Create a job schedule for the snapmirror of root volume
+      na_ontap_job_schedule: 
+        hostname: "{{ inventory_hostname }}" 
+        username: "{{ username }}" 
+        password: "{{ password }}"
+        state: present 
+        name: "{{ item.job_name }}"
+        job_minutes: "{{ item.job_minutes }}"
+        https: true 
+        validate_certs: false
+      with_items:
+        - "{{ job_schedule }}"
+      tags:
+        - ontap_config_job_schedule
+
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Create the SnapMirror relationship between root volume and mirror volumes (new format)
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+#    - name: Create the SnapMirror relationships
+#      na_ontap_snapmirror:
+#        hostname: "{{ inventory_hostname }}"
+#        username: "{{ username }}"
+#        password: "{{ password }}"
+#        state: present
+#        source_endpoint:
+#          cluster: "{{ source_cluster }}"
+#          path: "{{ svm_name }} : {{ svm_root_volume }}"
+#        destination_endpoint:
+#          cluster: "{{ destination_cluster }}"
+#          path: "{{ svm_name }} : {{item.root_mirror_volume }}"      
+#        relationship_type: load_sharing
+#        schedule: "{{ job_schedule.0.job_name }}"
+#        https: true
+#        validate_certs: false
+#      with_items:
+#        - "{{ root_mirror_volumes }}"
+#      tags:
+#        - ontap_snapmirror_relationship
+
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Create the SnapMirror relationship between root volume and mirror volumes
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+    - name: Create the SnapMirror relationships
+      na_ontap_snapmirror:
+        hostname: "{{ inventory_hostname }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+        state: present
+        source_volume: "{{ svm_root_volume }}"
+        destination_volume: "{{ item.root_mirror_volume }}"
+        source_vserver: "{{ svm_name }}"
+        destination_vserver: "{{ svm_name }}"
+        relationship_type: load_sharing
+        schedule: "{{ job_schedule.0.job_name }}"
+        https: true
+        validate_certs: false
+      with_items:
+        - "{{ root_mirror_volumes }}"
+      tags:
+        - ontap_snapmirror_relationship
+
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Initialize the snapmirror relationship
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+    - name: Initialize the mirroring relationship
+      na_ontap_snapmirror:
+        hostname: "{{ inventory_hostname }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+        state: present
+        source_path: "{{ svm_name }}:{{ svm_root_volume }}"
+        destination_path: "{{ svm_name }}:{{ item.root_mirror_volume }}"
+        https: true
+        validate_certs: false
+      with_items:
+        - "{{ root_mirror_volumes }}"
+      tags:
+        - ontap_snapmirror_relationship
+
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Initialize the mirroring relationship
+#    - name: Initialize the mirroring relationship
+#      na_ontap_snapmirror:
+#        hostname: "{{ inventory_hostname }}"
+#        username: "{{ username }}"
+#        password: "{{ password }}"
+#        state: present
+#        source_endpoint:
+#          path: "{{ svm_name }} : {{ svm_root_volume }}"
+#        destination_endpoint:
+#          path: "{{ svm_name }} : {{item.root_mirror_volume }}"
+#        https: true
+#        validate_certs: false
+#      with_items:
+#        - "{{ root_mirror_volumes }}"
+#      tags:
+#        - ontap_snapmirror_relationship
+
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Set the password for vsadmin first. Account cannot be unlocked without password
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+    - name: Set password for vsadmin user
+      na_ontap_user:
+        hostname: "{{ inventory_hostname }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+        state: present
+        vserver: "{{ svm_name }}"
+        applications: http,ontapi,ssh
+        authentication_method: password
+        role_name: vsadmin
+        lock_user: yes
+        name: vsadmin
+        set_password: "{{ vsadmin_password }}"
+        https: true
+        validate_certs: false
+      tags:
+        - ontap_unlock_svm_admin
+
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Unlock vsadmin user (This is the SVM admin account)
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+    - name: Unlock vsadmin user
+      na_ontap_user:
+        hostname: "{{ inventory_hostname }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+        state: present
+        vserver: "{{ svm_name }}"
+        applications: http,ontapi,ssh
+        authentication_method: password
+        role_name: vsadmin
+        lock_user: no
+        name: vsadmin
+        https: true
+        validate_certs: false
+      tags:
+        - ontap_unlock_svm_admin
+
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Create LIF for SVM Management            
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+    - name: Create LIF for Oracle SVM Management
+      na_ontap_interface:
+        hostname: "{{ inventory_hostname }}" 
+        username: "{{ username }}" 
+        password: "{{ password }}" 
+        state: present 
+        vserver: "{{ svm_name }}"
+        role: data 
+        protocols: none 
+        home_node: "{{ node_data_ports[0].node_name }}" 
+        home_port: "{{ item.home_port }}"
+        address: "{{ item.address }}" 
+        netmask: "{{ item.netmask }}"
+        interface_name: "{{ item.lif_name }}" 
+        admin_status: up 
+        failover_policy: broadcast-domain-wide 
+        firewall_policy: mgmt 
+        is_auto_revert: true 
+        https: true 
+        validate_certs: false
+      with_items:
+        - "{{ svm_specs }}"
+      tags:
+        - ontap_svm_mgmt_lif
+
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------	  

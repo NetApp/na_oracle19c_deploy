@@ -1,0 +1,48 @@
+---
+- block:
+# Register RedHat subscription linked to a user account
+    - name: Register subscriptions for RedHat Server
+      community.general.redhat_subscription:
+        state: present
+        username: '{{ redhat_sub_username }}'
+        password: '{{ redhat_sub_password }}'
+        auto_attach: true
+      become: true
+      tags:
+        - register_subscription_el8
+
+    - name: Copy Oracle 19c preinstall rpm file to Oracle inventory host
+      ansible.builtin.copy:
+        src: "oracle-database-preinstall-19c-1.0-2.el8.x86_64.rpm"
+        dest: /tmp
+      become: true
+      tags:
+        - cp_preinstall-19c_rpm_el8
+
+    - name: Install Oracle 19c preinstall rpm on Oracle inventory host
+      yum:
+        name: "/tmp/oracle-database-preinstall-19c-1.0-2.el8.x86_64.rpm"
+        state: present 
+        disable_gpg_check: yes
+      become: true
+      tags: 
+        - inst_preinstall-19c_rpm_el8
+
+# Copy over compat-libcap1-1.10 rpm to oracle inventory host
+    - name: Copy compat-libcap1-1.10 to Oracle inventory host
+      ansible.builtin.copy:
+        src: compat-libcap1-1.10-7.el7.x86_64.rpm
+        dest: /tmp
+      become: true
+      tags:
+        - cp_compat-libcap1-1.10_el8
+
+# Install compat-libcap1-1.10 to workaround missing compat-libcap1-1.10 in Linux 8
+    - name: Install compat-libcap1-1.10 from OL 7
+      yum:
+        name: "/tmp/compat-libcap1-1.10-7.el7.x86_64.rpm"
+        state: present
+        disable_gpg_check: yes
+      become: true
+      tags:
+        - inst_compat-libcap1-1.10_el8
