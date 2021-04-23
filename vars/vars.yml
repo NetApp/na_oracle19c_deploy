@@ -11,7 +11,7 @@
 ca_signed_certs: false
 
 # AWX/Tower Inventory Group name
-hosts: ontap
+hosts_group: ontap
 
 # Names of the Nodes in the ONTAP Cluster
 nodes:
