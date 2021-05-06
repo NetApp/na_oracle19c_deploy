@@ -1,8 +1,8 @@
 #ONTAP Host
 [ontap]
-10.61.184.183
+10.10.10.10
 
 #Oracle hosts
 [oracle]
-rtpora01
-rtpora02
+ora_host01
+ora_host02
