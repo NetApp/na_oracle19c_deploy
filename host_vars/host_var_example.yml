@@ -1,4 +1,5 @@
----
+#nfs_ip: 172.21.126.176
+
 # Oracle db log mode: true or false
 #log_archive_mode: true
 
