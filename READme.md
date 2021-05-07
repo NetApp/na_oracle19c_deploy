@@ -31,7 +31,7 @@ Requirements
 Variables
 ---------
 
-For detailed instructions for running the playbook refer to NetAppDocs (Provide link to NetAppDoc page.)
+For detailed instructions for running the playbook refer to NetAppDocs https://docs.netapp.com/us-en/netapp-solutions/ent-db/getting_started_requirements.html
 
     ######################################################################
     ###### Oracle 19c deployment user configuration variables       ######
