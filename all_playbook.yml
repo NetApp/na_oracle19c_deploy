@@ -1,3 +1,18 @@
+---
+- name: Install requirements for running the playbooks
+  hosts: localhost
+  connection: local
+  gather_facts: False
+  tasks:
+    - name: Install python libraries
+      pip:
+        name:
+          - netapp-lib
+          - xmltodict
+          - jmespath
+  tags:
+    - requirements_config
+
 - name: ONTAP Setup and Storage Config for Oracle
   collections:
     - netapp.ontap
@@ -6,7 +21,6 @@
   gather_facts: False
   vars_files:
     - roles/ontap/defaults/main.yml    
-    - vars/vars.yml
   vars_prompt:
     - name: vsadmin_password
       prompt: Enter vsadmin password for the SVM
@@ -22,7 +36,6 @@
   gather_facts: True
   vars_files:
     - roles/linux/defaults/main.yml
-    - vars/vars.yml
   roles:
     - role: linux
   tags:
@@ -34,7 +47,6 @@
   vars_files:
     - roles/oracle/defaults/main.yml
     - roles/linux/defaults/main.yml
-    - vars/vars.yml
   roles:
     - role: oracle
   tags:
