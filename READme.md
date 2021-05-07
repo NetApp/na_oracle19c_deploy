@@ -50,13 +50,13 @@ For detailed instructions for running the playbook refer to NetAppDocs (Provide 
 
     # Names of the Nodes in the ONTAP Cluster
     nodes:
-      - Ansible-A220-01
-      - Ansible-A220-02
+      - AFF-01
+      - AFF-02
 
     # Storage VLANs
     # Add additional rows for vlans as necessary
     storage_vlans:
-      - {vlan_id: "3382", name: "ORA_NFS", protocol: "NFS"}
+      - {vlan_id: "100", name: "ORA_NFS", protocol: "NFS"}
 
     # Details of the Data Aggregates that need to be created
     # If Aggregate creation takes longer, subsequent tasks of creating volumes may fail.
@@ -103,8 +103,8 @@ For detailed instructions for running the playbook refer to NetAppDocs (Provide 
     # Leave it black if hugepage is not configured on the host.
     hugepages_nr: 3072
 
-    redhat_sub_username: 
-    redhat_sub_password:
+    redhat_sub_username: username
+    redhat_sub_password: password
 
     ####################################################
     ### DB env specific install and config variables ###
@@ -118,7 +118,7 @@ For detailed instructions for running the playbook refer to NetAppDocs (Provide 
 
 Host_vars
 ---------
-    nfs_ip: 172.21.126.176
+    ansible_host: 10.10.10.10
 
     # Oracle db log mode: true or false
     log_archive_mode: true
