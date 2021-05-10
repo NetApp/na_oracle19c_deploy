@@ -106,32 +106,6 @@
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
-# Create the SnapMirror relationship between root volume and mirror volumes (new format)
-# ----------------------------------------------------------------------------------------------------------------------
-# ----------------------------------------------------------------------------------------------------------------------
-#    - name: Create the SnapMirror relationships
-#      na_ontap_snapmirror:
-#        hostname: "{{ inventory_hostname }}"
-#        username: "{{ username }}"
-#        password: "{{ password }}"
-#        state: present
-#        source_endpoint:
-#          cluster: "{{ source_cluster }}"
-#          path: "{{ svm_name }} : {{ svm_root_volume }}"
-#        destination_endpoint:
-#          cluster: "{{ destination_cluster }}"
-#          path: "{{ svm_name }} : {{item.root_mirror_volume }}"      
-#        relationship_type: load_sharing
-#        schedule: "{{ job_schedule.0.job_name }}"
-#        https: true
-#        validate_certs: false
-#      with_items:
-#        - "{{ root_mirror_volumes }}"
-#      tags:
-#        - ontap_snapmirror_relationship
-
-# ----------------------------------------------------------------------------------------------------------------------
-# ----------------------------------------------------------------------------------------------------------------------
 # Create the SnapMirror relationship between root volume and mirror volumes
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
@@ -173,26 +147,6 @@
         - "{{ root_mirror_volumes }}"
       tags:
         - ontap_snapmirror_relationship
-
-# ----------------------------------------------------------------------------------------------------------------------
-# ----------------------------------------------------------------------------------------------------------------------
-# Initialize the mirroring relationship
-#    - name: Initialize the mirroring relationship
-#      na_ontap_snapmirror:
-#        hostname: "{{ inventory_hostname }}"
-#        username: "{{ username }}"
-#        password: "{{ password }}"
-#        state: present
-#        source_endpoint:
-#          path: "{{ svm_name }} : {{ svm_root_volume }}"
-#        destination_endpoint:
-#          path: "{{ svm_name }} : {{item.root_mirror_volume }}"
-#        https: true
-#        validate_certs: false
-#      with_items:
-#        - "{{ root_mirror_volumes }}"
-#      tags:
-#        - ontap_snapmirror_relationship
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
