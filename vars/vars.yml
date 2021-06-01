@@ -68,15 +68,15 @@ mount_points:
 # Leave it black if hugepage is not configured on the host.
 hugepages_nr: 3072
 
-redhat_sub_username: allen.cao@netapp.com
-redhat_sub_password: LinkMeta@2019
+redhat_sub_username: xxxxx
+redhat_sub_password: xxxxx
 
 ####################################################
 ### DB env specific install and config variables ###
 ####################################################
 
 # Database domain name
-db_domain: cie.netapp.com
+db_domain: xxxxx
 
 # Set initial password for all required Oracle passwords. Change them after installation.
-initial_pwd_all: NetApp!23
+initial_pwd_all: xxxxx
